@@ -4,7 +4,7 @@
 #'
 #' @param palette the name of the palette, defaults to "main"
 #' @param reverse should the palette's order be reversed, defaults to FALSE
-#' @param n.colors how many colors should be in the palette, defaults to NULL
+#' @param n.colors choose this to limit the number of colors in the palette, defaults to NULL for all of the palette's colors
 #' @param ... further arguments to pass to `grDevices::colorRampPalette`
 #'
 #' @return a color palette object for use in, e.g., ggplot

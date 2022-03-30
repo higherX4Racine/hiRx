@@ -11,7 +11,7 @@ higher_ex_pal(palette = "main", reverse = FALSE, n.colors = NULL, ...)
 
 \item{reverse}{should the palette's order be reversed, defaults to FALSE}
 
-\item{n.colors}{how many colors should be in the palette, defaults to NULL}
+\item{n.colors}{choose this to limit the number of colors in the palette, defaults to NULL for all of the palette's colors}
 
 \item{...}{further arguments to pass to `grDevices::colorRampPalette`}
 }
