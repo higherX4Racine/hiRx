@@ -1,0 +1,17 @@
+Package: hiRx
+Type: Package
+Title: Helpful Tools for Higher Expectations' Data Work
+Version: 0.1.0
+Authors@R:
+    person(given = "Ben", family = "Taft", email = "ben.taft@higherexpectations", role = c("aut", "cre"))
+Description: This is probably going to be a meta-package, eventually.
+    Right now, this package contains requently-used routines and branding-related constants.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.1.2
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Imports: 
+    grDevices
