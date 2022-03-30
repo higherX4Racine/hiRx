@@ -15,11 +15,15 @@
 
 #' Look up a color from Higher Expectations' palette
 #'
+#' Higher Expectations for Racine County has several color palettes that were
+#' designed by the branding team.
+#'
 #' @param ... Character vectors that name colors. Calling without arguments returns every color.
 #'
 #' @return An unnamed vector of colors in hex format
 #' @export
 #'
+#' @note The possible values for
 #' @examples
 #' blues <- higher_ex_cols("Bright Blue", "Medium Blue", "Navy")
 higher_ex_cols <- function(...) {

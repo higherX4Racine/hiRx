@@ -13,7 +13,11 @@ higher_ex_cols(...)
 An unnamed vector of colors in hex format
 }
 \description{
-Look up a color from Higher Expectations' palette
+Higher Expectations for Racine County has several color palettes that were
+designed by the branding team.
+}
+\note{
+The possible values for
 }
 \examples{
 blues <- higher_ex_cols("Bright Blue", "Medium Blue", "Navy")

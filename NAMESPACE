@@ -2,3 +2,5 @@
 
 export(higher_ex_cols)
 export(higher_ex_pal)
+export(scale_color_higher_ex)
+export(scale_fill_higher_ex)
