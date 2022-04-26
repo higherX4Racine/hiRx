@@ -1,0 +1,60 @@
+---
+title: "Style Reference"
+author: "Higher Expectations for Racine County"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+# output:
+#    word_document:
+#        reference_docx: "HE style reference.docx"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Word Style Reference Document}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(hiRx)
+```
+
+# Style Reference
+
+[RStudio](https://rstudio.com) uses the [`bookdown`](https://bookdown.org) to render Word documents.
+The developers of `bookdown` decided that the most effective way to manage styling for Word documents was for the user to create a reference document with customized styles.
+This document is an Rmarkdown progenitor for just such a style reference document.
+
+## Second-level Heading
+
+### Third-level Heading
+
+#### Fourth-level Heading
+
+```{r a-figure, fig.cap = "A figure caption"}
+
+ggplot2::ggplot() +
+    ggplot2::geom_text(ggplot2::aes(x = 1,
+                                    y = 1,
+                                    label = "Hello, World")) +
+    ggplot2::theme_void() +
+    ggplot2::theme(text = ggplot2::element_text(family = "Myriad Pro"))
+
+```
+
+A table
+
+```{r a-table}
+
+knitr::kable(tibble::tribble(
+    ~ Foo, ~ Bar, ~ Baz,
+    1, "a", TRUE,
+    2, "b", FALSE,
+    3, "c", NA
+))
+
+```

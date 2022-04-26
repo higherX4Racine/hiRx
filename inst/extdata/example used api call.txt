@@ -1,0 +1,12 @@
+https://api.data.gov/ed/collegescorecard/v1/schools
+?id=238193,45175001,45175002,451750,238430,238458,238476,238616,238759,459851,459842,239105,239248,239309,239318,239390,240453,491288,240374,491297,240189,240125,240338
+&fields=
+school.name,
+id,
+ope6_id,
+latest.student.size,
+latest.student.enrollment.undergrad_12_month,
+latest.completion.completion_rate_4yr_150nt,
+latest.completion.completion_rate_less_than_4yr_150nt
+&per_page=100
+&api_key=

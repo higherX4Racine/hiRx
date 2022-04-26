@@ -11,8 +11,14 @@ Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.2
 Suggests: 
-    testthat (>= 3.0.0)
+    rmarkdown,
+    testthat (>= 3.0.0),
+    knitr,
+    tibble
 Config/testthat/edition: 3
 Imports: 
     ggplot2,
     grDevices
+VignetteBuilder: knitr
+Depends: 
+    R (>= 2.10)
