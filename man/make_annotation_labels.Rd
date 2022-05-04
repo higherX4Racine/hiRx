@@ -2,12 +2,12 @@
 % Please edit documentation in R/annotation_table.R
 \name{make_annotation_labels}
 \alias{make_annotation_labels}
-\title{Change any percentage values to graphable ones}
+\title{Create a column of formatted labels from one of disparate numeric values.}
 \usage{
 make_annotation_labels(.x, .rate_key = "Rate")
 }
 \arguments{
-\item{.x}{a tibble}
+\item{.x}{a tibble with fields ``Measure`` and ``Value``.}
 
 \item{.rate_key}{a string in the Measure name that indicates a percentage}
 }
@@ -15,7 +15,7 @@ make_annotation_labels(.x, .rate_key = "Rate")
 a tibble with a new column, ``Label``, that is formatted.
 }
 \description{
-Change any percentage values to graphable ones
+Create a column of formatted labels from one of disparate numeric values.
 }
 \examples{
 make_annotation_labels(

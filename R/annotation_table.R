@@ -5,6 +5,7 @@
 #' @param .x the data frame to summarize
 #' @param .col the column to find indices in.
 #' @param .focal_value a value to focus on (e.g. the year 2020)
+#' @param .peak_col a column to search for its max. defaults to "Value"
 #'
 #' @return a tibble with ``Name``, ``Index``, ``X Offset``, and ``Y Offset``
 #' @export
@@ -15,13 +16,13 @@
 #'     hiRx::unlump_series(Series) %>%
 #'     dplyr::filter(`Measure Code` == "06", Month == "January") %>%
 #'     identify_indices(Year, 2020)
-identify_indices <- function(.x, .col, .focal_value) {
+identify_indices <- function(.x, .col, .focal_value, .peak_col = "Value") {
     .values <- dplyr::pull(.x, {{ .col }})
-
+    .to_max <- dplyr::pull(.x, {{ .peak_col }})
     tibble::tribble(
         ~ Name, ~ Index, ~ `X Offset`, ~ `Y Offset`,
         "first", which.min(.values), -1, -1,
-        "peak value", which.max(.x$Value), 0, 1,
+        "peak value", which.max(.to_max), 0, 1,
         paste(.focal_value, "index"), which(.values == .focal_value), 0, 0,
         "final", which.max(.values), 1, -1
     )
@@ -32,6 +33,7 @@ identify_indices <- function(.x, .col, .focal_value) {
 #' @param .x the data frame to summarize
 #' @param .col the column to find indices in.
 #' @param .focal_value a value to focus on (e.g. the year 2020)
+#' @param .group_col designates the category to find indices within
 #'
 #' @return a data frame with fields ``Name``, ``Measure``, ``Value``, and ``Label``
 #' @export
@@ -42,13 +44,15 @@ identify_indices <- function(.x, .col, .focal_value) {
 #' racine_laus %>%
 #'     purrr::pluck("wisconsin") %>%
 #'     hiRx::unlump_series(Series) %>%
+#'     dplyr::select(`Measure Code`, Year, Month, Value) %>%
 #'     dplyr::filter(`Measure Code` == "06", Month == "January") %>%
-#'     identify_indices(Year, 2020)
+#'     annotation_table(Year, 2020, `Measure Code`)
 annotation_table <- function(.x,
                              .col,
-                             .focal_value) {
+                             .focal_value,
+                             .group_col) {
     .x %>%
-        dplyr::group_by(.data$Measure) %>%
+        dplyr::group_by({{ .group_col }}) %>%
         tidyr::nest() %>%
         dplyr::mutate(
             Indices = purrr::map(.data$data,

@@ -4,7 +4,7 @@
 \alias{annotation_table}
 \title{Create a data from for putting labels on a graph.}
 \usage{
-annotation_table(.x, .col, .focal_value)
+annotation_table(.x, .col, .focal_value, .group_col)
 }
 \arguments{
 \item{.x}{the data frame to summarize}
@@ -12,6 +12,8 @@ annotation_table(.x, .col, .focal_value)
 \item{.col}{the column to find indices in.}
 
 \item{.focal_value}{a value to focus on (e.g. the year 2020)}
+
+\item{.group_col}{designates the category to find indices within}
 }
 \value{
 a data frame with fields ``Name``, ``Measure``, ``Value``, and ``Label``
@@ -23,6 +25,7 @@ Create a data from for putting labels on a graph.
 racine_laus \%>\%
     purrr::pluck("wisconsin") \%>\%
     hiRx::unlump_series(Series) \%>\%
+    dplyr::select(`Measure Code`, Year, Month, Value) \%>\%
     dplyr::filter(`Measure Code` == "06", Month == "January") \%>\%
-    identify_indices(Year, 2020)
+    annotation_table(Year, 2020, `Measure Code`)
 }

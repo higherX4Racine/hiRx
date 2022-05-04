@@ -4,7 +4,7 @@
 \alias{identify_indices}
 \title{Identify the indices of rows that will be labelled in a graph}
 \usage{
-identify_indices(.x, .col, .focal_value)
+identify_indices(.x, .col, .focal_value, .peak_col = "Value")
 }
 \arguments{
 \item{.x}{the data frame to summarize}
@@ -12,6 +12,8 @@ identify_indices(.x, .col, .focal_value)
 \item{.col}{the column to find indices in.}
 
 \item{.focal_value}{a value to focus on (e.g. the year 2020)}
+
+\item{.peak_col}{a column to search for its max. defaults to `Value`}
 }
 \value{
 a tibble with ``Name``, ``Index``, ``X Offset``, and ``Y Offset``
