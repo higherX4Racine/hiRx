@@ -28,26 +28,6 @@ fetch_laus_table <- function(table_name,
 }
 
 
-some_laus_tables <- function(.x, pattern, column_specification) {
-    .x %>%
-        dplyr::select(
-            .data$Table
-        ) %>%
-        dplyr::filter(
-            stringr::str_detect(.data$Table,
-                                pattern)
-        ) %>%
-        dplyr::mutate(
-            Data = purrr::map(.data$Table,
-                              fetch_laus_table,
-                              column_specification),
-            .keep = "unused"
-        ) %>%
-        tidyr::unnest("Data") %>%
-        invisible()
-}
-
-
 laus_tables <- xml2::read_html(
     file.path(BLS_DOMAIN,
               LAUS_PATH)
@@ -129,45 +109,6 @@ laus_series_definitions <- fetch_laus_table(
         end_period = readr::col_character()
     )
 )
-
-.data_columns <- readr::cols(
-    series_id = readr::col_character(),
-    year = readr::col_integer(),
-    period = readr::col_character(),
-    value = readr::col_double(),
-    footnote_codes = readr::col_character()
-)
-
-laus_current <- some_laus_tables(laus_tables,
-                                 "Current",
-                                 .data_columns)
-
-laus_legacy <- laus_tables %>%
-    some_laus_tables(
-        "Region|AllStates|California|NewYork",
-        .data_columns
-    ) %>%
-    dplyr::filter(
-        .data$year < 1990
-    )
-
-laus_all <- dplyr::bind_rows(laus_current,
-                             laus_legacy) %>%
-    dplyr::filter(
-        .data$period != "M13"
-    ) %>%
-    dplyr::mutate(
-        date = lubridate::make_date(year = .data$year,
-                                    month = as.integer(
-                                        stringr::str_sub(.data$period,
-                                                         2)
-                                    ),
-                                    day = 1),
-        .keep = "unused",
-        .after = .data$series_id
-    )
-
-rm(laus_current, laus_legacy)
 
 every_series_appearance <- laus_tables %>%
     dplyr::select(
