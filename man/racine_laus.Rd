@@ -6,14 +6,14 @@
 \title{Local Area Unemployment Data Series for Racine, Wisconsin}
 \format{
 A list of three data frames, each of which have 6 variables:
-\describe{
-    \item{Geography}{a 15-character FIPS-like geocode.}
-    \item{Measure}{an enum from the Python package ``herc.bls.laus``.}
-    \item{Series}{a 20-char. BLS code concatenating ``Geography`` and ``Measure``.}
-    \item{Year}{the four-digit year of the series}
-    \item{Month}{an ordered factor with full month names in English.}
-    \item{Value}{the value of the measure for the area and date.}
-}
+    \describe{
+        \item{Geography}{a 15-character FIPS-like geocode.}
+        \item{Measure}{an enum from the Python package ``herc.bls.laus``.}
+        \item{Series}{a 20-char. BLS code concatenating ``Geography`` and ``Measure``.}
+        \item{Year}{the four-digit year of the series}
+        \item{Month}{an ordered factor with full month names in English.}
+        \item{Value}{the value of the measure for the area and date.}
+    }
 }
 \source{
 \url{https://api.bls.gov/publicAPI/v2/timeseries/data/}

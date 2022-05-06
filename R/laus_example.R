@@ -1,0 +1,25 @@
+# Copyright (C) 2022 by Higher Expectations for Racine County
+
+#' Some Example Local Area Unemployment Statistics Data Series
+#'
+#' A table of LAUS series from four places: Nashua, NH; Minneapolis, MN; Ithaca,
+#' NY, and Racine WI. There are four kinds of data: Unemployment Rate,
+#' Unemployed People, Employed People, and Labor Force. These data are all not
+#' adjusted for seasonality.
+#'
+#'
+#'
+#' @format This table demonstrates what raw series data look like when
+#'   downloaded from the BLS's plain-text data archives, as described in
+#'   \code{vignette("laus", package = "hiRx")}.
+#'
+#'   \describe{
+#'   \item{series_id}{a 20-character BLS series code}
+#'   \item{year}{an integer giving the year of the observation}
+#'   \item{period}{a 3-character code, either the month or annual mean.}
+#'   \item{value}{a real number that is either people or a percentage.}
+#'   \item{footnote_codes}{a one-character flag if the observation is weird.}
+#'   }
+#'
+#' @source \url{https://download.bls.gov/pub/time.series/la/}
+"laus_example"

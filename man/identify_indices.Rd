@@ -13,7 +13,7 @@ identify_indices(.x, .col, .focal_value, .peak_col = "Value")
 
 \item{.focal_value}{a value to focus on (e.g. the year 2020)}
 
-\item{.peak_col}{a column to search for its max. defaults to `Value`}
+\item{.peak_col}{a column to search for its max. defaults to "Value"}
 }
 \value{
 a tibble with ``Name``, ``Index``, ``X Offset``, and ``Y Offset``

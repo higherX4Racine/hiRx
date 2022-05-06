@@ -10,15 +10,16 @@ OBSERVATION_COLUMNS <- readr::cols(
     value = readr::col_double(),
     footnote_codes = readr::col_character()
 )
-FIRST_YEAR_OF_CURRENT_OBSERVATIONS <- 1990
-PATTERN_FOR_CURRENT_OBSERVATIONS <- "Current"
+
 PATTERN_FOR_LEGACY_OBSERVATIONS <- "Region|AllStates|California|NewYork"
+PATTERN_FOR_CURRENT_OBSERVATIONS <- "Current"
+FIRST_YEAR_OF_CURRENT_OBSERVATIONS <- 1990
 PERIOD_TO_EXCLUDE <- "M13"
 PERIOD_PATTERN <- "\\d+$"
 
-fetch_laus_observations <- function(.x,
+laus_fetch_observations <- function(index_table,
                                     pattern) {
-    .x %>%
+    index_table %>%
         dplyr::select(
             .data$Table
         ) %>%
@@ -28,7 +29,7 @@ fetch_laus_observations <- function(.x,
         ) %>%
         dplyr::mutate(
             Data = purrr::map(.data$Table,
-                              fetch_laus_table,
+                              laus_fetch_table,
                               OBSERVATION_COLUMNS),
             .keep = "unused"
         ) %>%
@@ -46,14 +47,14 @@ fetch_laus_observations <- function(.x,
 
 laus_current <- function(.laus_tables) {
     .laus_tables %>%
-        fetch_laus_observations(PATTERN_FOR_CURRENT_OBSERVATIONS) %>%
+        laus_fetch_observations(PATTERN_FOR_CURRENT_OBSERVATIONS) %>%
         invisible()
 }
 
 
 laus_legacy <- function(.laus_tables) {
     .laus_tables %>%
-        fetch_laus_observations(
+        laus_fetch_observations(
             PATTERN_FOR_LEGACY_OBSERVATIONS
         ) %>%
         dplyr::filter(
@@ -65,7 +66,7 @@ laus_legacy <- function(.laus_tables) {
 
 #' Download a huge table of LAUS observations
 #'
-#' @param .laus_tables a table from calling \code{\link{fetch_laus_tables}}.
+#' @param .laus_tables a table from calling \code{\link{laus_fetch_tables}}.
 #'
 #' @return A tibble that will have more than a million observations.
 #'    Its columns are:

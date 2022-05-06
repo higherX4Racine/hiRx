@@ -21,6 +21,9 @@ SERIES_NAMES <- c(
 
 N_PARTS <- length(SERIES_NAMES)
 
+INTEGER_COLUMNS <- SERIES_NAMES[c(4, 6)]
+
+
 #' Separate a LAUS series code into its components
 #'
 #' @param .x a data frame or character vector with series codes
@@ -52,9 +55,9 @@ N_PARTS <- length(SERIES_NAMES)
 #'     "LAUMC554802000000004",
 #'     "LAURD840000000000006"
 #' )
-laus_parse_series <- function(.x, .col = "series") {
+laus_parse_series <- function(.x, .col = "series_id") {
     if (rlang::inherits_any(.x,
-                            c("tbl_df", "tbl", "data.fram"))) {
+                            c("tbl_df", "tbl", "data.frame"))) {
         .result <- tidyr::separate(data = .x,
                                    col = {{ .col }},
                                    into = SERIES_NAMES,
@@ -77,6 +80,9 @@ laus_parse_series <- function(.x, .col = "series") {
         stop(".x must be a data frame or a character vector")
     }
     .result %>%
-        convert_code_columns() %>%
-        invisible()
+        dplyr::mutate(
+            dplyr::across(INTEGER_COLUMNS,
+                          as.integer)
+    ) %>%
+    invisible()
 }

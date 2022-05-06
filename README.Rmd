@@ -37,48 +37,6 @@ Create plots and documents that feature Higher Expectations' format preferences,
 
 Data from the Bureau of Labor Statistics are important for several of the reports that we make at Higher Expectations.
 
-#### LAUS Data
-
-Local Area Unemployment Statistics are systems indicators of workforce health.
-There are many ways to access these data, including a RESTful API and direct downloads of text files.
-As of March 2022, it is actually faster to download the entire data set in text form than it is to query one complete series from the REST API.
-\U1f644
-OK, I lie.
-That's actually only true for data from after 1990.
-Older data are nested within specific state files.
-However, there are only four sub-state areas that have data from before 1990:
-
-- BS06 : Balance of California, state less Los Angeles-Long Beach-Glendale MD
-- BS36 : Balance of New York, state less New York city
-- CT3651000 : New York city, NY
-- DV0631084 : Los Angeles-Long Beach-Glendale, CA Metropolitan Division
-
-These series only come from NY and CA.
-That mean that the they're only states for which we need to download legacy data.
-The data for every other sub-state area begin in 1990.
-
-We can get all of the data in four steps.
-First, create a "current_laus" tibble by downloading data sets with "Current" in their name.
-Second, create a "legacy_laus" tibble by downloading data sets with "AllStates," "Region," "NewYork," or "California" in their names.
-Third, remove observations in the "legacy_laus" table from before 1990.
-Finally, bind the two tibbles together into "all_laus".
-
-  
-Yes, those two "balance" areas are literally the containing state minus the corresponding city or metropolitan division.
-My conclusion from these observations is that there is no need to download tables of data from individual states.
-We also don't need to download the data files with "Current" in their name.
-What we want are the data files that are grouped by geographic area.
-
-The master list of LAUS data files can be found at the [root of the plain text data site](https://download.bls.gov/pub/time.series/la).
-If you know that your local machine's data are out-of-date, you can run `update_laus` to download all of the most recent data.
-This command will create XX tables:
-
-- `laus_records`: every observation from every series. A concatenation of
-  - [`laus_cities`](https://download.bls.gov/pub/time.series/la/la.data.65.City)
-  - [`laus_counties`](https://download.bls.gov/pub/time.series/la/la.data.64.County)
-* `laus_series`: metadata for every series.
-* `laus_areas`: 
-
 ## Example
 
 TBD
