@@ -103,21 +103,21 @@ laus_observations <- dplyr::bind_rows(laus_legacy,
 rm(laus_legacy, laus_current)
 ```
 
-
 As of May 2022, this `laus_observations` tibble has 13,727,807 observations.
-
-### Wrangling
 
 Since the result from [Downloading](#downloading) has more than 10 million rows, it isn't suitable for use in a vignette as example data.
 Instead, I will use a smaller example with "only" 6704 observations.
 As you can see below, it has sixteen different series.
 
 ```{r show-laus-example}
+laus_example <- NULL
 data("laus_example", package = "hiRx")
 laus_example %>%
     dplyr::count(.data$series_id) %>%
     knitr::kable()
 ```
+
+### Wrangling
 
 The series IDs by themselves are not particularly helpful.
 They contain four pieces of information packed together:
@@ -130,10 +130,104 @@ They contain four pieces of information packed together:
   - A 0- to 11-digit FIPS code for a specific area within a state
 - What kind of observation the series reports on (e.g. "03" for Unemployment Rate)
 
-Fortunately, the LAUS plain-text database has translation tables for all of these codes.
+#### Metadata
+
+The BLS site has [a table that provides documentation](https://download.bls.gov/pub/time.series/la/la.series) for every one of its series.
+Here is a distilled version with just the useful metadata about the series in the example data.
+
+```{r laus-example-series-metadata}
+laus_series_metadata <- laus_fetch_table(
+    "la.series",
+    readr::cols(
+        series_id = readr::col_character(),
+        area_type_code = readr::col_character(),
+        area_code = readr::col_character(),
+        measure_code = readr::col_integer(),
+        seasonal = readr::col_character(),
+        srd_code = readr::col_integer(),
+        series_title = readr::col_character(),
+        footnote_codes = readr::col_character(),
+        begin_year = readr::col_integer(),
+        begin_period = readr::col_character(),
+        end_year = readr::col_integer(),
+        end_period = readr::col_character()
+    )
+)
+
+laus_example_metadata <- laus_example %>%
+    dplyr::distinct(
+        .data$series_id
+    ) %>%
+    dplyr::left_join(
+        laus_series_metadata,
+        by = "series_id"
+    ) %>%
+    dplyr::select(
+        where(~ dplyr::n_distinct(.) > 1)
+    )
+
+laus_example_metadata %>%
+    knitr::kable(
+        col.names = names(.) %>%
+            stringr::str_replace_all("_", " ") %>%
+            stringr::str_to_title()
+    )
+```
+
+You can see that the series title is a combination of the names of its area and its measure.
+BLS also provides a [table of area names for each area code](https://download.bls.gov/pub/time.series/la/la.areamaps).
+The entries for our four example areas look like this:
+
+```{r laus-example-area-names}
+laus_areas <- laus_fetch_table(
+    "la.areamaps",
+    readr::cols(
+        area_type_code = readr::col_character(),
+        area_code = readr::col_character(),
+        area_text = readr::col_character(),
+        display_level = readr::col_integer(),
+        selectable = readr::col_logical(),
+        sort_sequence = readr::col_integer()
+    )
+)
+
+laus_example_areas <- laus_example_metadata %>%
+    dplyr::distinct(.data$area_code) %>%
+    dplyr::left_join(laus_areas, by = "area_code") %>%
+    dplyr::select(where(~dplyr::n_distinct(.) > 1))
+
+laus_example_areas %>%
+    knitr::kable(
+        col.names = names(.) %>%
+            stringr::str_replace_all("_", " ") %>%
+            stringr::str_to_title()
+    )
+```
+
+The descriptions of the measures are in their own [table on the BLS site](https://download.bls.gov/pub/time.series/la/la.measure).
+The example data only contain the first four types of measures that are found in the following table.
+
+```{r laus-example-measure-glossary}
+laus_glossary_measure <- laus_fetch_table(
+    "la.measure",
+    readr::cols(
+        measure_code = readr::col_integer(),
+        measure_text = readr::col_character()
+    )
+)
+
+laus_glossary_measure %>%
+    knitr::kable(
+        col.names = names(.) %>%
+            stringr::str_replace_all("_", " ") %>%
+            stringr::str_to_title()
+    )
+```
+
+There are several such key-value files on the LAUS site.
 I'm going to fold them all into a single tibble called `laus_glossaries`.
 
-```{r fetch-laus-glossaries}
+```{r fetch-laus-glossaries, include = FALSE}
 laus_glossaries <- c(
     "area_type",
     "footnote",
@@ -163,4 +257,42 @@ laus_glossaries <- c(
             )
     ) %>%
     dplyr::bind_rows()
+```
+
+### Plotting
+
+So, to look at trends in unemployment rates among the four example areas:
+
+```{r laus-example-plot-unemployment-rates}
+laus_example_metadata %>%
+    dplyr::filter(
+        .data$measure_code == 3
+    ) %>%
+    dplyr::left_join(
+        laus_example_areas,
+        by = "area_code"
+    ) %>%
+    dplyr::left_join(
+        laus_example %>%
+            dplyr::filter(.data$period == "M13"),
+        by = "series_id"
+    ) %>%
+    ggplot2::ggplot(ggplot2::aes(
+        x = .data$year,
+        y = .data$value,
+        color = stringr::str_extract(
+            .data$area_text,
+            "^\\w+")
+    )) + 
+    ggplot2::geom_line() + 
+    ggplot2::labs(x = "Year",
+                  y = "Unemployment",
+                  color = NULL) +
+    scale_color_higher_ex("tableau") +
+    ggplot2::scale_y_continuous(
+        labels = scales::label_percent(scale = 1,
+                                       accuracy = 1),
+        limits = c(0, NA)
+    ) + 
+    ggplot2::theme_minimal()
 ```
