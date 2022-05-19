@@ -5,7 +5,7 @@
 \alias{laus_example}
 \title{Some Example Local Area Unemployment Statistics Data Series}
 \format{
-This table demonstrates== what raw series data look like when
+This table demonstrates what raw series data look like when
   downloaded from the BLS's plain-text data archives, as described in
   \code{vignette("laus", package = "hiRx")}.
 
@@ -14,7 +14,7 @@ This table demonstrates== what raw series data look like when
   \item{year}{an integer giving the year of the observation}
   \item{period}{a 3-character code, either the month or annual mean.}
   \item{value}{a real number that is either people or a percentage.}
-  \item{footnote_codes}{a one-character flag that the observation is weird.}
+  \item{footnote_codes}{a one-character flag if the observation is weird.}
   }
 }
 \source{

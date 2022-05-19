@@ -1,0 +1,80 @@
+---
+title: "census_geographies"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{census_geographies}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+content_size <- c(width = 7, height = 4)
+content_dpi <- 96
+knitr::opts_chunk$set(
+    collapse = TRUE,
+    warning = FALSE,
+    message = FALSE,
+    comment = "#>",
+    cache = TRUE,
+    dpi = content_dpi,
+    fig.dim = content_size
+)
+```
+
+```{r setup}
+library(rlang)
+library(magrittr)
+library(hiRx)
+```
+
+```{r load_shapefiles}
+DATA_PATH <- file.path(path.expand("~"),
+                       "Higher Expectations/Data/Downloads")
+
+SHAPEFILE_PATH <- file.path(DATA_PATH,
+                            "Census Shapefiles",
+                            "2020")
+
+racine_city <- file.path(SHAPEFILE_PATH,
+                         "tl_2020_55_cousub.shp") %>%
+    sf::st_read() %>%
+    dplyr::filter(
+        .data$COUSUBFP == "66000"
+    ) %>%
+    dplyr::select(
+        where(~ !is.na(.))
+    )
+
+rusd <- file.path(SHAPEFILE_PATH,
+                  "tl_2020_55_unsd.shp") %>%
+    sf::st_read() %>%
+    dplyr::filter(
+        .data$UNSDLEA == "12360"
+    ) %>%
+    dplyr::select(
+        where(~ !is.na(.))
+    )
+
+county_blocks <- file.path(SHAPEFILE_PATH,
+                           "tl_2020_55_tabblock20.shp") %>%
+    sf::st_read() %>%
+    dplyr::rename_with(stringr::str_remove,
+                       pattern = "20$") %>%
+    dplyr::filter(
+        .data$COUNTYFP == "101"
+    ) %>%
+    dplyr::mutate(
+        BLKGRPID = stringr::str_sub(.data$GEOID,
+                                    end = 12)
+    ) %>%
+    only_informative_columns()
+```
+
+```{r wrangle_blocks}
+racine_blocks <- in_or_out(county_blocks,
+                           racine_city,
+                           .data$BLKGRPID)
+
+# rusd_blocks <- census_block_group_coverage(county_blocks,
+#                                            rusd)
+```

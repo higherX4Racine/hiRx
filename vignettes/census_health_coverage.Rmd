@@ -1,0 +1,198 @@
+---
+title: "census_health_coverage"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{census_health_coverage}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+content_size <- c(width = 7, height = 4)
+content_dpi <- 96
+knitr::opts_chunk$set(
+    collapse = TRUE,
+    warning = FALSE,
+    message = FALSE,
+    comment = "#>",
+    cache = TRUE,
+    dpi = content_dpi,
+    fig.dim = content_size
+)
+```
+
+```{r setup}
+library(rlang)
+library(magrittr)
+library(hiRx)
+```
+
+```{r load_geographies}
+DATA_PATH <- file.path(path.expand("~"),
+                       "Higher Expectations/Data/Downloads")
+
+SHAPEFILE_PATH <- file.path(DATA_PATH,
+                            "Census Shapefiles",
+                            "2020")
+
+racine_city <- file.path(SHAPEFILE_PATH,
+                         "tl_2020_55_cousub.shp") %>%
+    sf::st_read() %>%
+    dplyr::filter(
+        .data$COUSUBFP == "66000"
+    ) %>%
+    dplyr::select(
+        where(~ !is.na(.))
+    )
+
+county_blocks <- file.path(SHAPEFILE_PATH,
+                           "tl_2020_55_tabblock20.shp") %>%
+    sf::st_read() %>%
+    dplyr::rename_with(stringr::str_remove,
+                       pattern = "20$") %>%
+    dplyr::filter(
+        .data$COUNTYFP == "101"
+    ) %>%
+    dplyr::mutate(
+        BLKGRPID = stringr::str_sub(.data$GEOID,
+                                    end = 12)
+    ) %>%
+    dplyr::select(
+        where(~ dplyr::n_distinct(.) > 1)
+    )
+
+racine_blocks <- county_blocks %>%
+    sf::st_filter(racine_city)
+
+county_tracts <- county_blocks %>%
+    dplyr::group_by(
+        .data$TRACTCE
+        ) %>%
+    dplyr::summarize(
+        POP = sum(.data$POP),
+        Area = sum(.data$ALAND + .data$AWATER),
+        geometry = sf::st_union(.data$geometry)
+    ) %>%
+    dplyr::ungroup()
+
+racine_tracts <- county_tracts %>%
+    sf::st_filter(racine_city)
+
+```
+
+```{r census_details}
+foo <- "acs5 2020 variables.json" %>%
+    file.path(DATA_PATH, .) %>%
+    jsonlite::read_json() %>%
+    purrr::pluck(1)
+
+census_details <- foo %>%
+    purrr::transpose(.) %>%
+    tibble::as_tibble() %>%
+    dplyr::mutate(
+        dplyr::across(.fns = as.character),
+        variable = names(foo)
+        ) %>%
+    dplyr::filter(
+        stringr::str_detect(.data$group,
+                            "B")
+        )
+rm(foo)
+```
+
+```{r health_variables}
+health_variables <- census_details %>%
+    dplyr::filter(
+        stringr::str_detect(.data$concept,
+                            "COVERAGE BY AGE"),
+        stringr::str_detect(.data$label,
+                            "No|years[^!]*$")
+    ) %>%
+    dplyr::select(
+        .data$variable,
+        .data$label
+    ) %>%
+    tidyr::separate(
+        col = .data$label,
+        into = c(NA,NA,"Age","Covered"),
+        sep = "!!",
+        fill = "right"
+    ) %>%
+    tidyr::replace_na(
+        list(Covered = "Yes")
+    ) %>%
+    dplyr::mutate(
+        Age = stringr::str_remove(.data$Age,
+                                  ":"),
+        Covered = stringr::str_remove(.data$Covered,
+                                      "health insurance coverage") %>%
+            stringr::str_squish()
+    ) %>%
+    dplyr::arrange(.data$variable)
+```
+
+```{r health_by_tract}
+health_by_tract <- acs5_query_url(2020,
+                health_variables$variable,
+                "tract",
+                racine_tracts$TRACTCE,
+                state = 55,
+                county = 101) %>%
+    jsonlite::read_json() %>%
+    tibble_from_json() %>%
+    tidyr::pivot_longer(
+        cols = !c(.data$state, .data$county, .data$tract),
+        names_to = "variable",
+        values_to = "people",
+        values_transform = list(people = as.integer)
+        ) %>%
+    dplyr::rename(TRACTCE = .data$tract) %>%
+    dplyr::left_join(health_variables, by = "variable")
+
+age_totals <- health_by_tract %>%
+    dplyr::group_by(
+        .data$Age,
+                    .data$TRACTCE
+        ) %>%
+    dplyr::summarize(
+        `Age Total` = sum(.data$people)
+        )
+
+health_by_tract <- health_by_tract %>%
+    dplyr::filter(
+        .data$Covered == "Yes"
+        ) %>%
+    dplyr::select(
+        .data$TRACTCE,
+        .data$Age,
+        .data$people
+        ) %>%
+    dplyr::left_join(
+        age_totals,
+                     by = c("Age", "TRACTCE")
+        ) %>%
+    dplyr::rename(
+        `People Covered` = .data$people,
+        `Total People` = .data$`Age Total`
+        ) %>%
+    dplyr::mutate(
+        Age = factor(.data$Age,
+                     levels = unique(.data$Age)),
+        Coverage = .data$`People Covered` / .data$`Total People`
+        )
+```
+
+```{r plot_health_and_age, fig.dim = c(8, 3.2), out.width = "90%", fig.align = "center"}
+racine_tracts %>%
+    dplyr::left_join(health_by_tract, by = "TRACTCE") %>%
+    ggplot2::ggplot() +
+    ggplot2::geom_sf(ggplot2::aes(fill = .data$Coverage)) +
+    ggplot2::geom_sf(data = racine_city,
+                     color = "yellow",
+                     fill = NA) +
+    ggplot2::theme_minimal() +
+    ggplot2::facet_grid(cols = ggplot2::vars(.data$Age)) +
+    ggplot2::scale_fill_continuous(labels = scales::label_percent(1)) +
+    ggplot2::scale_x_continuous(breaks = seq(-87.85, -87.6, by = 0.05)) +
+    ggplot2::scale_y_continuous(breaks = seq(42.65, 42.85, by = 0.05))
+```
