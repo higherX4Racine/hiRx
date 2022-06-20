@@ -8,6 +8,16 @@
 #' @param ... further arguments to pass to `grDevices::colorRampPalette`
 #'
 #' @return a color palette object for use in, e.g., ggplot
+#'     The available palettes are
+#'     \describe{
+#'         \item{main}{Five colors from the branding document}
+#'         \item{blues}{Three shades of blue, light to dark}}
+#'         \item{econ}{Two shades of orange}
+#'         \item{logo}{Gray, Gold, and White}
+#'         \item{race}{Four colors for Racine's empirical census races}
+#'         \item{inverse}{The reverse of `logo`}
+#'         \item{tableau}{The first four default colors from Tableau}
+#' }
 #' @export
 #'
 #' @examples
@@ -46,6 +56,10 @@ higher_ex_pal <- function(palette = "main",
         "Medium Blue",
         "Navy"
     ),
+    econ = higher_ex_cols(
+        `Not Economically Disadvantaged` = "Tableau Sunny",
+        `Economically Disadvantaged` = "Tableau Orange"
+    ),
     logo = higher_ex_cols(
         "Gray",
         "Gold",
@@ -53,11 +67,9 @@ higher_ex_pal <- function(palette = "main",
     ),
     race = higher_ex_cols(c(
         Black = "Tableau Azure",
-        Latinx = "Tableau Olive",
+        `Latin@` = "Tableau Olive",
         White = "Tableau Green",
-        `2+` = "Tableau Muave",
-        `Non-Econ` = "Tableau Sunny",
-        `Econ Disadvant` = "Tableau Orange"
+        `All Other Races` = "Tableau Muave"
     )),
     inverse = higher_ex_cols(
         "White",

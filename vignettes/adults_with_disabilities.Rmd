@@ -1,0 +1,261 @@
+---
+title: "Adults with Disabilities in Racine"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Adults with Disabilities in Racine}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+content_size <- c(width = 7, height = 4)
+content_dpi <- 96
+knitr::opts_chunk$set(
+    collapse = TRUE,
+    warning = FALSE,
+    message = FALSE,
+    comment = "#>",
+    cache = TRUE,
+    dpi = content_dpi,
+    fig.dim = content_size
+)
+```
+
+```{r setup}
+library(rlang)
+library(magrittr)
+library(hiRx)
+DATA_PATH <- file.path(path.expand("~"),
+                       "Higher Expectations/Data")
+
+load(file.path(DATA_PATH, "Iterations", "populations by muni and tract.Rdata"))
+```
+
+```{r helper_functions}
+build_variable <- function(table,
+                           race_code,
+                           index,
+                           status) {
+    paste0(table,
+           race_code,
+           "_",
+           stringr::str_pad(index + status,
+                            width = 3,
+                            side = "left",
+                            pad = 0),
+           "E"
+           )
+}
+
+acquire_acs_variables_for_tracts <- function(variables,
+                                             year,
+                                             tracts,
+                                             ...) {
+    acs5_query_url(year = year,
+                   variables = variables,
+                   for_geo = "tract",
+                   for_items = tracts,
+                   ...) %>%
+        paste0(., "&key=", Sys.getenv("CENSUS_API_KEY")) %>%
+        jsonlite::read_json()
+}
+
+wrangle_acs_query <- function(jsonlist,
+                              variable_names,
+                              .val_trans_f = readr::parse_integer) {
+    jsonlist %>%
+    hiRx::census_json_to_tibble() %>%
+    tidyr::pivot_longer(
+        cols = tidyselect::any_of(variable_names),
+        names_to = "Variable",
+        values_to = "Population",
+        values_transform = .val_trans_f,
+        values_drop_na = TRUE
+    )
+}
+```
+
+```{r disability_variables}
+
+DISABILITY_TABLE <- "B18101"
+
+CENSUS_RACE_SUFFIXES <- c(
+    `White Including Latinx` = "A",
+    Black = "B",
+    `First Nations` = "C",
+    Asian = "D",
+    `Pacific Islander` = "E",
+    Other = "F",
+    `Multi-Racial` = "G",
+    White = "H",
+    Latinx = "I"
+)
+
+RACE_AGE_ROWS <- tibble::tribble(
+    ~ `Lower Age`, ~ `Upper Age`, ~ `Age Group`, ~ `Start Index`,
+    0, 18, "Youth", 2,
+    18, 64, "Adult", 5,
+    65, 999, "Senior", 8
+)
+
+DISABILITY_STATUS <- c(
+    Disabled = 1,
+    `Not Disabled` = 2
+)
+
+RACE_DISABILITY_VARIABLES <- tidyr::expand_grid(
+    `Census Race` = names(CENSUS_RACE_SUFFIXES),
+    RACE_AGE_ROWS,
+    `Disability Status` = names(DISABILITY_STATUS)
+) %>%
+    dplyr::mutate(
+        Variable = build_variable(
+            table = DISABILITY_TABLE,
+            race_code = CENSUS_RACE_SUFFIXES[.data$`Census Race`],
+            index = .data$`Start Index`,
+            status = DISABILITY_STATUS[.data$`Disability Status`]
+        )
+    ) %>%
+    dplyr::select(
+        !.data$`Start Index`
+    )
+
+EVERYBODY_DISABILITY_AGES <- tibble::tribble(
+    ~ `Lower Age`, ~ `Upper Age`, ~ `Age Group`, ~ `Start Index`,
+    0, 5, "Youth", 3,
+    5, 18, "Youth", 6,
+    18, 35, "Adult", 9,
+    35, 65, "Adult", 12,
+    65, 75, "Senior", 15,
+    75, 999, "Senior", 18
+)
+
+EVERYBODY_SEXES <- c(
+    Male = 0,
+    Female = 19
+)
+
+EVERYBODY_DISABILITY_VARIABLES <- tidyr::expand_grid(
+    Sex = names(EVERYBODY_SEXES),
+    EVERYBODY_DISABILITY_AGES,
+    `Disability Status` = names(DISABILITY_STATUS)
+) %>%
+    dplyr::mutate(
+        Variable = build_variable(
+            table = DISABILITY_TABLE,
+            race_code = "",
+            index = .data$`Start Index` + EVERYBODY_SEXES[.data$Sex],
+            status = DISABILITY_STATUS[.data$`Disability Status`]
+        )
+    ) %>%
+    dplyr::select(
+        !.data$`Start Index`
+    )
+
+ALL_DISABILITY_VARIABLES <- c(
+    RACE_DISABILITY_VARIABLES$Variable,
+    EVERYBODY_DISABILITY_VARIABLES$Variable
+)
+
+DISABILITY_VARIABLES <-  split(ALL_DISABILITY_VARIABLES,
+                               rep(LETTERS,
+                                   each = 50,
+                                   length.out = length(ALL_DISABILITY_VARIABLES))
+)
+```
+
+```{r acquire_disabilities}
+
+RAW_DISABILITIES <- DISABILITY_VARIABLES %>%
+    purrr::map(
+        acquire_acs_variables_for_tracts,
+        year = 2020L,
+        tracts = unique(PLACE_TRACT_POPS$tract),
+        state = 55,
+        county = 101
+    ) %>%
+    purrr::map(
+        wrangle_acs_query,
+        variable_names = ALL_DISABILITY_VARIABLES
+        ) %>%
+    dplyr::bind_rows() %>%
+    dplyr::mutate(
+        Year = 2020L,
+        Vintage = 10 * floor(0.1 * .data$Year)
+    )
+```
+
+```{r wrangle_disability}
+RACE_DISABILITIES <- RAW_DISABILITIES %>%
+    dplyr::inner_join(
+        RACE_DISABILITY_VARIABLES,
+        by = "Variable"
+    ) %>%
+    dplyr::select(
+        !.data$Variable
+    ) %>%
+    tidyr::pivot_wider(
+        names_from = .data$`Census Race`,
+        values_from = .data$Population
+    ) %>%
+    dplyr::mutate(
+        Latinx = .data$Latinx + .data$`White Including Latinx` - .data$White,
+        `All Other Races` = .data$`First Nations` +
+            .data$Asian +
+            .data$`Pacific Islander` +
+            .data$Other +
+            .data$`Multi-Racial`
+    ) %>%
+    dplyr::select(
+        !c(.data$`White Including Latinx`,
+           .data$`First Nations`,
+            .data$Asian,
+            .data$`Pacific Islander`,
+            .data$Other,
+            .data$`Multi-Racial`)
+    )
+
+EVERYBODY_DISABILITIES <- RAW_DISABILITIES %>%
+    dplyr::inner_join(
+        EVERYBODY_DISABILITY_VARIABLES,
+        by = "Variable"
+    ) %>%
+    dplyr::group_by(
+        .data$state,
+        .data$county,
+        .data$tract,
+        .data$Year,
+        .data$Vintage,
+        .data$`Age Group`,
+        .data$`Disability Status`
+    ) %>%
+    dplyr::summarize(
+        `Tract Population` = sum(.data$Population),
+        .groups = "keep"
+    ) %>%
+    dplyr::ungroup()
+
+DISABILITIES <- dplyr::left_join(
+    RACE_DISABILITIES,
+    EVERYBODY_DISABILITIES,
+    by = c("state",
+           "county",
+           "tract",
+           "Year",
+           "Vintage",
+           "Age Group",
+           "Disability Status")
+) %>%
+    tidyr::pivot_longer(
+        cols = c(.data$Black,
+                 .data$Latinx,
+                 .data$White,
+                 .data$`All Other Races`),
+        names_to = "Race/Ethnicity",
+        names_transform = ~ factor(., levels = c("Black",
+                                                 "Latinx",
+                                                 "White",
+                                                 "All Other Races")),
+        values_to = "Population"
+    )
+```

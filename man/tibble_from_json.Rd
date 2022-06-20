@@ -9,9 +9,6 @@ tibble_from_json(x)
 \arguments{
 \item{x}{}
 }
-\value{
-
-}
 \description{
 Title
 }

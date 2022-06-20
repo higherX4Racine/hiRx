@@ -1,5 +1,5 @@
 ---
-title: "Style Reference"
+title: "Word Style Reference Document"
 author: "Higher Expectations for Racine County"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 # output:

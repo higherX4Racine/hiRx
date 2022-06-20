@@ -16,7 +16,7 @@ higher_ex_pal(palette = "main", reverse = FALSE, n.colors = NULL, ...)
 \item{...}{further arguments to pass to `grDevices::colorRampPalette`}
 }
 \value{
-a color palette object for use in, e.g., ggplot
+
 }
 \description{
 Look up a Higher Expectations color palette by name
