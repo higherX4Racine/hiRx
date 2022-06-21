@@ -2,13 +2,32 @@
 % Please edit documentation in R/census_api_query.R
 \name{acs5_query_url}
 \alias{acs5_query_url}
-\title{Title}
+\title{Build a URL for querying the 5-Year ACS API}
 \usage{
 acs5_query_url(year, variables, for_geo, for_items, ...)
 }
 \arguments{
-\item{...}{}
+\item{year}{the year to query}
+
+\item{variables}{a vector of variables}
+
+\item{for_geo}{a single geographic level, like "tract" or "block"}
+
+\item{for_items}{the specific geographies, or "*"}
+
+\item{...}{other items to pass to the query}
+}
+\value{
+one string that holds the entire query
 }
 \description{
-Title
+Build a URL for querying the 5-Year ACS API
+}
+\examples{
+hiRx::acs5_query_url(2020,
+                    "B190013_001E",
+                    for_geo = "tract",
+                    for_items = "*",
+                    state = 55,
+                    county = 101)
 }

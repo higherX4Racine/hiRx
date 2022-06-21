@@ -2,6 +2,9 @@
 
 #' Detect when geometries' interiors intersect.
 #'
+#' This approach uses a custom intersection algorithm that only counts areas as
+#' intersecting if their interiors overlap
+#'
 #' @param x an object of class `sf::sf`, `sf::sfc` or `sf::sfg`
 #' @param y an object of class `sf::sf`, `sf::sfc` or `sf::sfg`
 #' @param ... other arguments that might be passed to `sf::st_relate`

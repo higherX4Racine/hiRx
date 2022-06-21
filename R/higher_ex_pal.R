@@ -11,7 +11,7 @@
 #'     The available palettes are
 #'     \describe{
 #'         \item{main}{Five colors from the branding document}
-#'         \item{blues}{Three shades of blue, light to dark}}
+#'         \item{blues}{Three shades of blue, light to dark}
 #'         \item{econ}{Two shades of orange}
 #'         \item{logo}{Gray, Gold, and White}
 #'         \item{race}{Four colors for Racine's empirical census races}

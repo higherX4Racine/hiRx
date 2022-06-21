@@ -17,7 +17,8 @@ geom_interiors_intersect(x, y, ...)
 either a matrix of `logical`s or a list of row indices
 }
 \description{
-Detect when geometries' interiors intersect.
+This approach uses a custom intersection algorithm that only counts areas as
+intersecting if their interiors overlap
 }
 \seealso{
 `sf::st_relate`

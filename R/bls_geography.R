@@ -8,8 +8,6 @@
 #'
 #' @return a 15-digit geocode
 #' @export
-#'
-#' @examples
 bls_geography <- function(area_type,
                           state_or_region,
                           area = NULL) {

@@ -26,7 +26,6 @@ BLS_INDEX_TABLE_SEP <- "\\."
 #'     }
 #' @export
 #' @importFrom magrittr %>%
-#' @examples
 bls_index_table <- function(table_path) {
 
     file.path(BLS_DOMAIN,

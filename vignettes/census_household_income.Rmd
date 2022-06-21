@@ -1,0 +1,244 @@
+---
+title: "Household Income from the 5-Year ACS"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Household Income from the 5-Year ACS}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(hiRx)
+```
+
+## American Community Survey 5-Year Tables
+
+### Median Household Income
+
+```{r decennial_income_settings}
+.ACS5_INCOME_VARIABLES <- tibble::tribble(
+    ~ Variable, ~ "Race/Ethnicity",
+    "B19013_001E", "Everybody",
+    "B19013H_001E", "White",
+    "B19013B_001E", "Black",
+    "B19013I_001E", "Latin@"
+)
+
+.ACS5_INCOME_YEARS <- seq(2010, 2020, by = 5)
+
+CPI <- readr::read_csv(
+    file.path(DATA_PATH,
+              "Downloads",
+              "us annual consumer price index.csv"),
+    col_types = readr::cols(Year = readr::col_integer(),
+                            Annual = readr::col_double())
+    )
+
+.ACS5_INCOME_SETTINGS <- tibble::tibble(Year = .ACS5_INCOME_YEARS) %>%
+    dplyr::left_join(CPI, by = "Year") %>%
+    dplyr::arrange(.data$Year) %>%
+    dplyr::mutate(Ratio = dplyr::last(.data$Annual) / .data$Annual)
+
+```
+
+```{r acquire_incomes}
+INCOMES <- .ACS5_INCOME_YEARS %>%
+    purrr::map_chr(
+        acs5_query_url,
+        variables = paste0(.ACS5_INCOME_VARIABLES$Variable,
+                           collapse = ","),
+        for_geo = "tract",
+        for_items = paste0(unique(BLOCKS$TRACTCE),
+                           collapse = ","),
+        state = 55,
+        county = 101
+    ) %>%
+    magrittr::set_names(., .ACS5_INCOME_YEARS) %>%
+    purrr::map(paste0, "&key=", Sys.getenv("CENSUS_API_KEY")) %>%
+    purrr::map(jsonlite::read_json) %>%
+    purrr::map(census_json_to_tibble) %>%
+    dplyr::bind_rows(.id = "Year") %>%
+    dplyr::mutate(
+        Year = as.integer(.data$Year),
+        Vintage = 10 * floor(0.1 * .data$Year)
+    ) %>%
+    tidyr::pivot_longer(
+        cols = unique(.ACS5_INCOME_VARIABLES$Variable),
+        names_to = "Variable",
+        values_to = "Income",
+        values_transform = ~ readr::parse_integer(., na = c("", "NA", "NULL", "-666666666")),
+        values_drop_na = TRUE
+    ) %>%
+    dplyr::left_join(
+        .ACS5_INCOME_VARIABLES,
+        by = "Variable"
+    ) %>%
+    dplyr::select(
+        !.data$Variable
+    ) %>%
+    dplyr::left_join(
+        .ACS5_INCOME_SETTINGS,
+        by = "Year"
+    ) %>%
+    dplyr::mutate(
+        `Income in 2020 Dollars` = .data$Income * .data$Ratio
+    ) %>%
+    dplyr::select(
+        !c(.data$Annual, .data$Ratio)
+    )
+```
+
+### Median Incomes by Race and Location
+
+```{r wrangle_incomes}
+PLACE_TRACT_RACE_INCOMES <- PLACE_TRACT_RACES %>%
+    dplyr::filter(
+        .data$`Municipal Population` > 0
+    ) %>%
+    dplyr::inner_join(
+        INCOMES,
+        by = c("Year", "state", "county", "tract", "Race/Ethnicity")
+    ) %>%
+    dplyr::group_by(
+        .data$Year,
+        .data$Municipality,
+        .data$tract,
+        .data$`Race/Ethnicity`
+    ) %>%
+    dplyr::summarize(
+        People = sum(.data$`Municipal Population`),
+        dplyr::across(
+            tidyselect::starts_with("Income"),
+            weighted.mean,
+            w = .data$`Municipal Population` / .data$`Tract Population`
+        ),
+        .groups = "keep"
+    ) %>%
+    dplyr::ungroup()
+
+PLACE_INCOMES <- PLACE_TRACT_RACE_INCOMES %>%
+    dplyr::group_by(
+        .data$Year,
+        .data$Municipality,
+        .data$`Race/Ethnicity`
+    ) %>%
+    dplyr::summarize(
+        Population = sum(.data$People),
+        dplyr::across(
+            tidyselect::starts_with("Income"),
+            spatstat.geom::weighted.median,
+            w = .data$People
+        ),
+        .groups = "keep"
+    ) %>%
+    dplyr::ungroup()
+```
+
+```{r income_by_race_and_place}
+
+clean_up_income <- function(.x, ...) {
+    .x %>%
+        dplyr::filter(
+            !is.na(.data$Municipality)
+        ) %>%
+        dplyr::group_by(
+            .data$Municipality,
+            .data$Year,
+            ...
+        ) %>%
+        dplyr::summarize(
+            `Median Income` = spatstat.geom::weighted.median(
+                .data$Income,
+                .data$`Municipal Population`
+            ),
+            `Adjusted Median Income` = spatstat.geom::weighted.median(
+                .data$`Income in 2020 Dollars`,
+                .data$`Municipal Population`
+            ),
+            `Sample Size` = sum(.data$`Municipal Population`),
+            .groups = "keep"
+        ) %>%
+        dplyr::ungroup() %>%
+        dplyr::mutate(
+            Municipality = forcats::fct_reorder(.data$Municipality,
+                                                .data$`Adjusted Median Income`,
+                                                .fun = max)
+        )
+}
+
+PLACE_INCOMES <- INCOMES %>%
+    dplyr::filter(
+        .data$`Race/Ethnicity` == "Everybody"
+    ) %>%
+    dplyr::inner_join(
+        PLACE_TRACT_RACES %>%
+            dplyr::group_by(.data$Year,
+                            .data$Municipality,
+                            .data$tract) %>%
+            dplyr::summarize(`Municipal Population` = sum(.data$`Municipal Population`),
+                             .groups = "keep"),
+        by = c(Vintage = "Year", "tract")
+    ) %>%
+    clean_up_income()
+
+PLACE_AND_RACE_INCOMES <- INCOMES %>%
+    dplyr::inner_join(
+        dplyr::filter(PLACE_TRACT_RACES,
+                      .data$`Municipal Population` > 0),
+        by = c(Vintage = "Year", "tract", "Race/Ethnicity")
+    ) %>%
+    dplyr::filter(
+        !is.na(.data$Municipality)
+    ) %>%
+    clean_up_income(.data$`Race/Ethnicity`)
+```
+
+```{r plot_income_trends}
+PLACE_AND_RACE_INCOMES %>%
+    ggplot2::ggplot(
+        ggplot2::aes(x = .data$Year,
+                     y = .data$`Adjusted Median Income`,
+                     fill = .data$`Race/Ethnicity`)
+    ) +
+    ggplot2::geom_col(position = "dodge") +
+    ggplot2::scale_x_continuous(
+        breaks = .ACS5_INCOME_YEARS,
+        minor_breaks = NULL
+    ) +
+    ggplot2::scale_y_continuous(
+        labels = scales::label_dollar(),
+        limits = c(0, 150000)
+    ) +
+    hiRx::scale_fill_higher_ex("race", n.colors = 3) +
+    ggplot2::facet_wrap(ggplot2::vars(.data$Municipality)) +
+    ggplot2::theme_minimal() +
+    ggplot2::theme(legend.position = "right")
+```
+
+```{r compare_incomes_across_munis}
+PLACE_INCOMES %>%
+    ggplot2::ggplot(
+        ggplot2::aes(x = .data$Year,
+                     y = .data$`Adjusted Median Income`,
+                     fill = .data$Municipality)
+    ) +
+    ggplot2::geom_col(position = "dodge") +
+    ggplot2::scale_x_continuous(
+        breaks = .ACS5_INCOME_YEARS,
+        minor_breaks = NULL
+    ) +
+    ggplot2::scale_y_continuous(
+        labels = scales::label_dollar()
+    ) +
+    ggplot2::scale_fill_viridis_d(option = "E", direction = -1) +
+    ggplot2::theme_minimal() +
+    ggplot2::theme(legend.position = "right")
+```
+

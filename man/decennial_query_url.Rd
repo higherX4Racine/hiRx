@@ -2,13 +2,34 @@
 % Please edit documentation in R/census_api_query.R
 \name{decennial_query_url}
 \alias{decennial_query_url}
-\title{Title}
+\title{Create a query url for pulling data from the Decennial Census API}
 \usage{
 decennial_query_url(year, summary_table, variables, for_geo, for_items, ...)
 }
 \arguments{
-\item{...}{}
+\item{year}{the year to query}
+
+\item{summary_table}{the summary table that the variables come from}
+
+\item{variables}{the specific rows in the summary table}
+
+\item{for_geo}{the type of geographic area, like "county\%20subdivision"}
+
+\item{for_items}{the specific items, like "66000" or "*"}
+
+\item{...}{other keys to pass to the query}
+}
+\value{
+one string that holds the entire query
 }
 \description{
-Title
+Create a query url for pulling data from the Decennial Census API
+}
+\examples{
+hiRx::decennial_query_url(year = 2020,
+                          summary_table = "pl",
+                          for_geo = "block",
+                          for_items = "*",
+                          state = 55,
+                          county = 101)
 }

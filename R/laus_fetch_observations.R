@@ -66,7 +66,7 @@ laus_legacy <- function(.laus_tables) {
 
 #' Download a huge table of LAUS observations
 #'
-#' @param .laus_tables a table from calling \code{\link{laus_fetch_tables}}.
+#' @param .laus_tables a table from calling \code{\link{laus_fetch_table}}.
 #'
 #' @return A tibble that will have more than a million observations.
 #'    Its columns are:
@@ -79,7 +79,6 @@ laus_legacy <- function(.laus_tables) {
 #'    The \code{series} field contains tese
 #' @export
 #' @importFrom magrittr %>%
-#' @examples
 laus_all <- function(.laus_tables) {
     dplyr::bind_rows(laus_current(.laus_tables),
                      laus_legacy(.laus_tables)) %>%

@@ -7,7 +7,7 @@
 laus_all(.laus_tables)
 }
 \arguments{
-\item{.laus_tables}{a table from calling \code{\link{laus_fetch_tables}}.}
+\item{.laus_tables}{a table from calling \code{\link{laus_fetch_table}}.}
 }
 \value{
 A tibble that will have more than a million observations.

@@ -6,36 +6,23 @@
         paste0(collapse = "&")
 }
 
-#' Title
+#' Build a URL for querying the 5-Year ACS API
 #'
-#' @param x
+#' @param year the year to query
+#' @param variables a vector of variables
+#' @param for_geo a single geographic level, like "tract" or "block"
+#' @param for_items the specific geographies, or "*"
+#' @param ... other items to pass to the query
 #'
-#' @return
+#' @return one string that holds the entire query
 #' @export
-#'
-#' @importFrom magrittr %>%
-tibble_from_json <- function(x) {
-    x %>%
-        tail(-1) %>%
-        purrr::transpose(.) %>%
-        purrr::set_names(as.character(x[[1]])) %>%
-        tibble::as_tibble() %>%
-        dplyr::mutate(
-            dplyr::across(.fns = as.character)
-        )
-}
-
-#' Title
-#'
-#' @param year
-#' @param variables
-#' @param for_geo
-#' @param for_items
-#' @param ...
-#'
-#' @return
-#' @export
-#'
+#' @examples
+#' hiRx::acs5_query_url(2020,
+#'                     "B190013_001E",
+#'                     for_geo = "tract",
+#'                     for_items = "*",
+#'                     state = 55,
+#'                     county = 101)
 acs5_query_url <- function(year,
                            variables,
                            for_geo,
@@ -48,17 +35,24 @@ acs5_query_url <- function(year,
 }
 
 
-#' Title
+#' Create a query url for pulling data from the Decennial Census API
 #'
-#' @param year
-#' @param summary_table
-#' @param variables
-#' @param for_geo
-#' @param for_items
-#' @param ...
+#' @param year the year to query
+#' @param summary_table the summary table that the variables come from
+#' @param variables the specific rows in the summary table
+#' @param for_geo the type of geographic area, like "county\%20subdivision"
+#' @param for_items the specific items, like "66000" or "*"
+#' @param ... other keys to pass to the query
 #'
-#' @return
+#' @return one string that holds the entire query
 #' @export
+#' @examples
+#' hiRx::decennial_query_url(year = 2020,
+#'                           summary_table = "pl",
+#'                           for_geo = "block",
+#'                           for_items = "*",
+#'                           state = 55,
+#'                           county = 101)
 decennial_query_url <- function(year,
                                 summary_table,
                                 variables,

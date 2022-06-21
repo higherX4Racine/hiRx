@@ -7,8 +7,6 @@
 #' @return a tibble with a new category of Measure, "Additional Jobs"
 #' @export
 #' @importFrom magrittr %>%
-#'
-#' @examples
 laus_extra_jobs <- function(.x,
                             .focal_geo,
                             .comp_geo,
@@ -56,8 +54,6 @@ laus_extra_jobs <- function(.x,
 #' @return a tibble with a new Measure, ``"{.measure} Difference"``
 #' @export
 #' @importFrom magrittr %>%
-#'
-#' @examples
 calculate_geo_diff <- function(.x, .focal_geo, .comp_geo, .measure) {
 
     .time_fields <- c("Year", "Month")
