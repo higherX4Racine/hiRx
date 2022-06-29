@@ -9,9 +9,9 @@
 #' @return an `sf::sf` object, a data frame of features with a geometry column
 #' @export
 census_tigershapes_combine <- function(file_names,
-                                shapefile_path,
-                                ...) {
-    .filter_commands = rlang::enquos(...)
+                                       shapefile_path,
+                                       ...) {
+    .filter_commands <- rlang::enquos(...)
     file_names %>%
         purrr::imap(
             ~ file.path(shapefile_path,

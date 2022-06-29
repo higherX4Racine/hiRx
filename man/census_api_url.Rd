@@ -27,7 +27,7 @@ census_api_url(
 
 \item{year}{the year of the survey}
 
-\item{...}{other items to pass to the query}
+\item{...}{<[`dynamic dots`][rlang::dyn-dots]> other items to pass to the query}
 }
 \value{
 one URL, as a string

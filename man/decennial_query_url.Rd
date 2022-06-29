@@ -9,7 +9,7 @@ decennial_query_url(summary_table, ...)
 \arguments{
 \item{summary_table}{the code for a summary table from a decennial census}
 
-\item{...}{named arguments to pass to \code{\link[hiRx]{census_api_url}}}
+\item{...}{<[`dynamic dots`][rlang::dyn-dots]> named arguments to pass to \code{\link[hiRx]{census_api_url}}}
 }
 \value{
 one URL for an API call

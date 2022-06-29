@@ -54,7 +54,7 @@ census_api_query <- function(variables,
 #' @param survey_type e.g. "acs" or "dec"
 #' @param survey_or_table_code e.g. "acs5" or "pl"
 #' @param year the year of the survey
-#' @param ... other items to pass to the query
+#' @param ... <[`dynamic dots`][rlang::dyn-dots]> other items to pass to the query
 #'
 #' @return one URL, as a string
 #' @export
@@ -101,9 +101,12 @@ census_api_url <- function(variables,
 }
 
 
-#' Create an API query URL for variables from a 5-Year ACS
+#' Create an API query URL for tract-level data from a 5-Year ACS
 #'
-#' @param ... named arguments to pass to \code{\link[hiRx]{census_api_url}}
+#' @param for_items the tracts to fetch data for. Defaults to eastern Racine County
+#' @param state the state to fetch data for. Defaults to Wisconsin
+#' @param county the county to fetch data for. Defaults to Racine
+#' @param ... <[`dynamic dots`][rlang::dyn-dots]> named arguments to pass to \code{\link[hiRx]{census_api_url}}
 #'
 #' @return one URL for an API call
 #' @export
@@ -111,15 +114,22 @@ census_api_url <- function(variables,
 #' @examples
 #' census_acs5_tract_query_url(year = 2020,
 #'                             variables = paste0("B25003_00", 1:3, "E"))
-census_acs5_tract_query_url <- function(...){
+census_acs5_tract_query_url <- function(...,
+                                        for_items = NULL,
+                                        state = 55,
+                                        county = 101){
+    if (is.null(for_items)) {
+        for_items <- unique(hiRx::racine_race_pop_weights_by_tract$tract)
+    }
+
     census_api_url(
+        ...,
         survey_type = "acs",
         survey_or_table_code = "acs5",
         for_geo = "tract",
-        for_items = unique(hiRx::racine_race_pop_weights_by_tract$tract),
-        state = 55,
-        county = 101,
-        ...
+        for_items = for_items,
+        state = state,
+        county = county
     )
 }
 
@@ -127,7 +137,7 @@ census_acs5_tract_query_url <- function(...){
 #' Create an API query URL for a table from a decennial US Census
 #'
 #' @param summary_table the code for a summary table from a decennial census
-#' @param ... named arguments to pass to \code{\link[hiRx]{census_api_url}}
+#' @param ... <[`dynamic dots`][rlang::dyn-dots]> named arguments to pass to \code{\link[hiRx]{census_api_url}}
 #'
 #' @return one URL for an API call
 #' @export
