@@ -4,6 +4,7 @@
 #'
 #' @param .x a tibble with Census data that is organized by race
 #' @param race_tibble a tibble that defines condensed racial/ethnic factors
+#' @param ... <[`dynamic-dots`][rlang::dyn-dots]> ignored
 #' @param .code_field defaults to "Code"
 #' @param .name_field defaults to "Name"
 #' @param .val_field defaults to "Population"
@@ -15,6 +16,7 @@
 #' @export
 census_wrangle_race <- function(.x,
                                 race_tibble,
+                                ...,
                                 .code_field = "Code",
                                 .name_field = "Name",
                                 .val_field = "Population") {

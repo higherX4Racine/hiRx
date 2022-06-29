@@ -7,6 +7,7 @@
 census_wrangle_race(
   .x,
   race_tibble,
+  ...,
   .code_field = "Code",
   .name_field = "Name",
   .val_field = "Population"
@@ -16,6 +17,8 @@ census_wrangle_race(
 \item{.x}{a tibble with Census data that is organized by race}
 
 \item{race_tibble}{a tibble that defines condensed racial/ethnic factors}
+
+\item{...}{<[`dynamic-dots`][rlang::dyn-dots]> ignored}
 
 \item{.code_field}{defaults to "Code"}
 

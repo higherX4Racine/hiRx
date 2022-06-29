@@ -4,16 +4,16 @@
 \alias{aggregate_over_races}
 \title{Aggregate variables over all races/ethnicities}
 \usage{
-aggregate_over_races(.x, .f = sum, .all_races_label = "All", ...)
+aggregate_over_races(.x, ..., .f = sum, .all_races_label = "All")
 }
 \arguments{
 \item{.x}{a tibble with variables by race but no all-race totals}
 
+\item{...}{<[`dynamic dots`][rlang::dyn-dots]> The variables to aggregate.}
+
 \item{.f}{the function to aggregate with, defaults to \code{sum}.}
 
 \item{.all_races_label}{the level for all races. defaults to "All"}
-
-\item{...}{<[`dynamic dots`][rlang::dyn-dots]> The variables to aggregate.}
 }
 \value{
 a tibble with values aggregated over all races
