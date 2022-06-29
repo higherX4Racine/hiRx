@@ -4,13 +4,24 @@
 \alias{census_json_to_tibble}
 \title{Wrangle Census Table JSON}
 \usage{
-census_json_to_tibble(.l)
+census_json_to_tibble(
+  jsonlist,
+  variable_names,
+  .val_trans_f = readr::parse_integer,
+  .value_column = "Population"
+)
 }
 \arguments{
-\item{.l}{a list of lists from fetching Census data in JSON format}
+\item{jsonlist}{a list of lists from fetching Census data in JSON format}
+
+\item{variable_names}{the census API codes for variables}
+
+\item{.val_trans_f}{a function for converting variable values to numbers}
+
+\item{.value_column}{the name of the numeric column in the new table}
 }
 \value{
-a tibble in which rows are geometries and columns are variables.
+a tibble with fields for geographies, variable name, and value
 }
 \description{
 Wrangle Census Table JSON

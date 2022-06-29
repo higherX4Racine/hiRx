@@ -6,14 +6,14 @@
 \title{Populations of Different Races in Census Tracts and Places in Racine, WI}
 \format{
 a tibble with 6 columns:
-    \describe{
-        \item{Year}{four-digit integer}
-        \item{Municipality}{each county subdivision's NAME field.}
-        \item{tract}{the six-digit code of the tract within Racine County}
-        \item{Race/Ethnicity}{"Black", "Latin@", "White", or "All Other Races"}
-        \item{Municipal Population}{people who live in the tract and Municipality}
-        \item{Tract Population}{people in this race who live anywhere in the tract.}
-    }
+  \describe{
+    \item{Year}{four-digit integer}
+    \item{Municipality}{each county subdivision's NAME field.}
+    \item{tract}{the six-digit code of the tract within Racine County}
+    \item{Race/Ethnicity}{"Black", "Latin@", "White", or "All Other Races"}
+    \item{Municipal Population}{people who live in the tract and Municipality}
+    \item{Tract Population}{people in this race who live anywhere in the tract.}
+  }
 }
 \source{
 \url{https://api.census.gov}

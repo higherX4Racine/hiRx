@@ -14,11 +14,11 @@
 #'   \code{vignette("laus", package = "hiRx")}.
 #'
 #'   \describe{
-#'   \item{series_id}{a 20-character BLS series code}
-#'   \item{year}{an integer giving the year of the observation}
-#'   \item{period}{a 3-character code, either the month or annual mean.}
-#'   \item{value}{a real number that is either people or a percentage.}
-#'   \item{footnote_codes}{a one-character flag if the observation is weird.}
+#'     \item{series_id}{a 20-character BLS series code}
+#'     \item{year}{an integer giving the year of the observation}
+#'     \item{period}{a 3-character code, either the month or annual mean.}
+#'     \item{value}{a real number that is either people or a percentage.}
+#'     \item{footnote_codes}{a one-character flag if the observation is weird.}
 #'   }
 #'
 #' @source \url{https://download.bls.gov/pub/time.series/la/}
@@ -31,14 +31,15 @@
 #' Employment, Labor Force, Unemployment, and Unemployment Rate.
 #'
 #' @format A list of three data frames, each of which have 6 variables:
-#'     \describe{
-#'         \item{Geography}{a 15-character FIPS-like geocode.}
-#'         \item{Measure}{an enum from the Python package ``herc.bls.laus``.}
-#'         \item{Series}{a 20-char. BLS code concatenating ``Geography`` and ``Measure``.}
-#'         \item{Year}{the four-digit year of the series}
-#'         \item{Month}{an ordered factor with full month names in English.}
-#'         \item{Value}{the value of the measure for the area and date.}
-#'     }
+#'   \describe{
+#'     \item{Geography}{a 15-character FIPS-like geocode.}
+#'     \item{Measure}{an enum from the Python package ``herc.bls.laus``.}
+#'     \item{Series}{a 20-char. BLS code concatenating ``Geography`` and ``Measure``.}
+#'     \item{Year}{the four-digit year of the series}
+#'     \item{Month}{an ordered factor with full month names in English.}
+#'     \item{Value}{the value of the measure for the area and date.}
+#'   }
+#'
 #' @source \url{https://api.bls.gov/publicAPI/v2/timeseries/data/}
 "racine_laus"
 
@@ -52,13 +53,29 @@
 #' within census tracts and county subdivisions.
 #'
 #' @format a tibble with 6 columns:
-#'     \describe{
-#'         \item{Year}{four-digit integer}
-#'         \item{Municipality}{each county subdivision's NAME field.}
-#'         \item{tract}{the six-digit code of the tract within Racine County}
-#'         \item{Race/Ethnicity}{"Black", "Latin@", "White", or "All Other Races"}
-#'         \item{Municipal Population}{people who live in the tract and Municipality}
-#'         \item{Tract Population}{people in this race who live anywhere in the tract.}
-#'     }
+#'   \describe{
+#'     \item{Year}{four-digit integer}
+#'     \item{Municipality}{each county subdivision's NAME field.}
+#'     \item{tract}{the six-digit code of the tract within Racine County}
+#'     \item{Race/Ethnicity}{"Black", "Latin@", "White", or "All Other Races"}
+#'     \item{Municipal Population}{people who live in the tract and Municipality}
+#'     \item{Tract Population}{people in this race who live anywhere in the tract.}
+#'   }
+#'
 #' @source \url{https://api.census.gov}
 "racine_race_pop_weights_by_tract"
+
+#' Codes that flag which race/ethnicity a census table refers to
+#'
+#' The census defines several racial and ethnic groups. These arbitrary
+#' categories are somewhat consistent across different census years and
+#' different types of surveys.
+#' @format a tibble with 4 columns:
+#'   \describe{
+#'     \item{Race or Ethnic Group}{The name that the census uses for this group}
+#'     \item{Code}{A letter code used to identify census tables and variables.}
+#'     \item{Name}{My preferred name for this socially-defined category of people.}
+#'     \item{Race/Ethnicity}{The broad group for this subgroup in Racine, WI.}
+#'   }
+#' @source \url{https://www.census.gov/programs-surveys/acs/guidance/which-data-tool/table-ids-explained.html}
+"census_race_labels"

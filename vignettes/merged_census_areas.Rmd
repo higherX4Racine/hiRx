@@ -191,7 +191,7 @@ Table formats and contents vary across decennial censuses, which impacts the API
 The census API returns JSON data in a 2D, list-of-lists format. The following chunk makes a total of 3 api calls and retrieves thousands of observations (one for each block in Racine County).
 
 ```{r acquire_populations}
-POPS <- .DECENNIAL_POPULATION_SETTINGS %>%
+RAW_POPS <- .DECENNIAL_POPULATION_SETTINGS %>%
     purrr::pmap_chr(hiRx::decennial_query_url,
                     summary_table = "pl",
                     for_geo = "block",
@@ -200,31 +200,28 @@ POPS <- .DECENNIAL_POPULATION_SETTINGS %>%
                     county = 101
     ) %>%
     magrittr::set_names(., .DECENNIAL_POPULATION_SETTINGS$year) %>%
-    purrr::map(paste0, "&key=", Sys.getenv("CENSUS_API_KEY")) %>%
-    purrr::map(jsonlite::read_json) %>%
-    purrr::map(census_json_to_tibble) %>%
-    dplyr::bind_rows(.id = "Year") %>%
-    dplyr::mutate(Year = as.integer(.data$Year))
+    purrr::map(hiRx::census_do_api_query)
 ```
 
 There are some formatting problems in the data from the 2000 census. For example, the tract field is usually 6 digits long, so some responses need extra zeros on the right side. This formatting problem makes it really difficult to query on a per-tract basis. The total population variable also has a different name in some decennial census. Each of those names got its own column after the `bind rows` step above. One column has numbers for each census, and the rest are `NA`s. Here, those columns are stacked into a single one, and the `NA` variables are expunged.
 
 ```{r wrangle_populations}
-POPS <- POPS %>%
+POPS <- RAW_POPS %>%
+    purrr::map(
+        census_json_to_tibble,
+        variable_names = .DECENNIAL_POPULATION_VARIABLES$Variable
+    ) %>%
+    dplyr::bind_rows(
+        .id = "Year"
+    ) %>%
     dplyr::mutate(
+        Year = as.integer(.data$Year),
         tract = stringr::str_pad(
             .data$tract,
             width = 6,
             side = "right",
             pad = "0"
         )
-    ) %>%
-    tidyr::pivot_longer(
-        cols = unique(.DECENNIAL_POPULATION_VARIABLES$Variable),
-        names_to = "Variable",
-        values_to = "Population",
-        values_drop_na = TRUE,
-        values_transform = as.numeric
     ) %>%
     dplyr::left_join(
         .DECENNIAL_POPULATION_VARIABLES,

@@ -28,7 +28,7 @@ identify_indices <- function(.x, .col, .focal_value, .peak_col = "Value") {
     )
 }
 
-#' Create a data from for putting labels on a graph.
+#' Create a data frame for putting labels on a graph.
 #'
 #' @param .x the data frame to summarize
 #' @param .col the column to find indices in.
@@ -73,6 +73,10 @@ annotation_table <- function(.x,
 
 
 #' Create a column of formatted labels from one of disparate numeric values.
+#'
+#' This function looks in a character column for a regex that indicates whether
+#' a row is a percentage or a whole number. It then prettily formats the
+#' contents of a numeric column as either a percentage or a comma-separated int.
 #'
 #' @param .x a tibble with fields ``Measure`` and ``Value``.
 #' @param .rate_key a string in the Measure name that indicates a percentage

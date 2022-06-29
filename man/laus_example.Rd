@@ -10,11 +10,11 @@ This table demonstrates what raw series data look like when
   \code{vignette("laus", package = "hiRx")}.
 
   \describe{
-  \item{series_id}{a 20-character BLS series code}
-  \item{year}{an integer giving the year of the observation}
-  \item{period}{a 3-character code, either the month or annual mean.}
-  \item{value}{a real number that is either people or a percentage.}
-  \item{footnote_codes}{a one-character flag if the observation is weird.}
+    \item{series_id}{a 20-character BLS series code}
+    \item{year}{an integer giving the year of the observation}
+    \item{period}{a 3-character code, either the month or annual mean.}
+    \item{value}{a real number that is either people or a percentage.}
+    \item{footnote_codes}{a one-character flag if the observation is weird.}
   }
 }
 \source{

@@ -2,7 +2,7 @@
 % Please edit documentation in R/annotation_table.R
 \name{annotation_table}
 \alias{annotation_table}
-\title{Create a data from for putting labels on a graph.}
+\title{Create a data frame for putting labels on a graph.}
 \usage{
 annotation_table(.x, .col, .focal_value, .group_col)
 }
@@ -19,7 +19,7 @@ annotation_table(.x, .col, .focal_value, .group_col)
 a data frame with fields ``Name``, ``Measure``, ``Value``, and ``Label``
 }
 \description{
-Create a data from for putting labels on a graph.
+Create a data frame for putting labels on a graph.
 }
 \examples{
 racine_laus \%>\%

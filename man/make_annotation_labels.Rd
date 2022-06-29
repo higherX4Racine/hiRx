@@ -15,7 +15,9 @@ make_annotation_labels(.x, .rate_key = "Rate")
 a tibble with a new column, ``Label``, that is formatted.
 }
 \description{
-Create a column of formatted labels from one of disparate numeric values.
+This function looks in a character column for a regex that indicates whether
+a row is a percentage or a whole number. It then prettily formats the
+contents of a numeric column as either a percentage or a comma-separated int.
 }
 \examples{
 make_annotation_labels(
