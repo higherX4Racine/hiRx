@@ -17,16 +17,16 @@ higher_ex_pal(palette = "main", reverse = FALSE, n.colors = NULL, ...)
 }
 \value{
 a color palette object for use in, e.g., ggplot
-    The available palettes are
-    \describe{
-        \item{main}{Five colors from the branding document}
-        \item{blues}{Three shades of blue, light to dark}
-        \item{econ}{Two shades of orange}
-        \item{logo}{Gray, Gold, and White}
-        \item{race}{Four colors for Racine's empirical census races}
-        \item{inverse}{The reverse of `logo`}
-        \item{tableau}{The first four default colors from Tableau}
-}
+  The available palettes are
+  \describe{
+    \item{main}{Five colors from the branding document}
+    \item{blues}{Three shades of blue, light to dark}
+    \item{econ}{Two shades of orange}
+    \item{logo}{Gray, Gold, and White}
+    \item{race}{Four colors for Racine's empirical census races}
+    \item{inverse}{The reverse of `logo`}
+    \item{tableau}{The first four default colors from Tableau}
+  }
 }
 \description{
 Look up a Higher Expectations color palette by name

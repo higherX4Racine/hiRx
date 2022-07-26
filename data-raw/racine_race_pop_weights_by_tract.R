@@ -1,12 +1,6 @@
 # Copyright (C) 2022 by Higher Expectations for Racine County
 ## code to prepare `racine_race_pop_weights_by_tract` dataset goes here
 
-DATA_PATH <- file.path(path.expand("~"),
-                       "Higher Expectations/Data")
-
-SHAPEFILE_PATH <- file.path(DATA_PATH,
-                            "Downloads/Census Shapefiles")
-
 PLACE_FILES <- c(
     `2000` = "tl_2010_55101_cousub00.shp",
     `2010` = "tl_2010_55101_cousub10.shp",
@@ -14,7 +8,7 @@ PLACE_FILES <- c(
 )
 
 PLACES <- hiRx::census_tigershapes_combine(PLACE_FILES,
-                                           SHAPEFILE_PATH,
+                                           Sys.getenv("SHAPEFILE_PATH"),
                                            .data$COUNTYFP == "101") %>%
     dplyr::filter(
         .data$INTPTLON < -87.7,
@@ -31,7 +25,7 @@ BLOCK_FILES <- c(
 )
 
 BLOCKS <- hiRx::census_tigershapes_combine(BLOCK_FILES,
-                                           SHAPEFILE_PATH,
+                                           Sys.getenv("SHAPEFILE_PATH"),
                                            .data$COUNTYFP == "101") %>%
     dplyr::filter(
         .data$INTPTLON < -87.7,
