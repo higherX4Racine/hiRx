@@ -4,21 +4,12 @@
 \alias{census_expand_factors}
 \title{Create a table of census variables from factors and row offsets}
 \usage{
-census_expand_factors(
-  .x,
-  .level_field = "Level",
-  .offset_field = "Offset",
-  ...
-)
+census_expand_factors(..., .offset_field = "offset")
 }
 \arguments{
-\item{.x}{the table of factors and row offsets}
+\item{...}{<[`dynamic-dots`][rlang::dyn-dots]> data frames with factors and offsets}
 
-\item{.level_field}{the variable that names factor levels}
-
-\item{.offset_field}{the variable that gives row offsets}
-
-\item{...}{<[`dynamic-dots`][rlang::dyn-dots]> other factors without offsets}
+\item{.offset_field}{the variable that gives row offsets, defaults to "offset"}
 }
 \value{
 a table of census variables with their associated factors and rows
