@@ -6,6 +6,7 @@
 #' @param response the percentage-valued response variable
 #' @param label a horizontal axis label for the plot
 #' @param .race_ethnicity, optional, defaults to "Race/Ethnicity"
+#' @param .text_size, optional, defaults to 4
 #'
 #' @return a graphical object to chain with other ggplot2 items.
 #'
@@ -13,7 +14,8 @@
 plot_percent_by_race <- function(.x,
                                  response,
                                  label,
-                                 .race_ethnicity = "Race/Ethnicity"){
+                                 .race_ethnicity = "Race/Ethnicity",
+                                 .text_size = 4){
     .x %>%
         ggplot2::ggplot(
             ggplot2::aes(x = {{ response }},
@@ -30,7 +32,8 @@ plot_percent_by_race <- function(.x,
                 label = scales::label_percent(accuracy = 1)({{ response }})
             ),
             position = ggplot2::position_stack(vjust = 0.5),
-            col = "white"
+            col = "white",
+            size = .text_size
         ) +
         ggplot2::scale_y_discrete(
             name = NULL,

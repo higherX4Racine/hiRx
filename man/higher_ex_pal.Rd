@@ -26,6 +26,9 @@ a color palette object for use in, e.g., ggplot
     \item{race}{Four colors for Racine's empirical census races}
     \item{inverse}{The reverse of `logo`}
     \item{tableau}{The first four default colors from Tableau}
+    \item{navy gradient}{Navy, the intermediate green, and Gold}
+    \item{bright gradient}{Bright Blue, the intermediate green, and Gold}
+    \item{medium gradient}{Medium Blue, the intermediate green, and Gold}
   }
 }
 \description{

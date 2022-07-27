@@ -4,6 +4,9 @@
     Navy = "#0C223F",
     `Bright Blue` = "#00B2E2",
     `Medium Blue` = "#0081C9",
+    `Navy Green` = "#207C5C",
+    `Bright Green` = "#06CF79",
+    `Medium Green` = "#05B57E",
     White = "#FFFFFF",
     `Tableau Green` = "#159a48",
     `Tableau Azure` = "#0a4e8d",
@@ -30,7 +33,7 @@ higher_ex_cols <- function(...) {
     cols <- c(...)
 
     if (is.null(cols))
-        return (.higher_ex_colors)
+        return(.higher_ex_colors)
 
     tmp <- .higher_ex_colors[cols]
 

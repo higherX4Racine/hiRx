@@ -17,6 +17,9 @@
 #'     \item{race}{Four colors for Racine's empirical census races}
 #'     \item{inverse}{The reverse of `logo`}
 #'     \item{tableau}{The first four default colors from Tableau}
+#'     \item{navy gradient}{Navy, the intermediate green, and Gold}
+#'     \item{bright gradient}{Bright Blue, the intermediate green, and Gold}
+#'     \item{medium gradient}{Medium Blue, the intermediate green, and Gold}
 #'   }
 #' @export
 #'
@@ -80,5 +83,20 @@ higher_ex_pal <- function(palette = "main",
         "Tableau Azure",
         "Tableau Orange",
         "Tableau Green",
-        "Tableau Muave")
+        "Tableau Muave"),
+    `navy gradient` = higher_ex_cols(
+        "Navy",
+        "Navy Green",
+        "Gold"
+    ),
+    `bright gradient` = higher_ex_cols(
+        "Bright Blue",
+        "Bright Green",
+        "Gold"
+    ),
+    `medium gradient` = higher_ex_cols(
+        "Medium Blue",
+        "Medium Green",
+        "Gold"
+    )
 )
