@@ -31,7 +31,10 @@ collapse_a_factor <- function(.x,
         ) %>%
         dplyr::ungroup() %>%
         dplyr::mutate(
-            "{group_to_collapse}" := collapsed_label
+            "{group_to_collapse}" := factor(
+                collapsed_label,
+                levels = levels(.x[[group_to_collapse]])
+            )
         ) %>%
         dplyr::relocate(
             tidyselect::all_of(names(.x))

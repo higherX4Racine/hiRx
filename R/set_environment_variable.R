@@ -44,17 +44,17 @@ set_environment_variable <- function(key,
     if (install) {
         home <- Sys.getenv("HOME")
         renv <- file.path(home, ".Renviron")
-        if(file.exists(renv)){
+        if (file.exists(renv)) {
             # Backup original .Renviron before doing anything else here.
             file.copy(renv, file.path(home, ".Renviron_backup"))
         }
-        if(!file.exists(renv)){
+        if (!file.exists(renv)) {
             file.create(renv)
         }
         else{
-            if(isTRUE(overwrite)){
+            if (isTRUE(overwrite)) {
                 message("Your original .Renviron will be backed up and stored in your R HOME directory if needed.")
-                oldenv=read.table(renv, stringsAsFactors = FALSE)
+                oldenv <- read.table(renv, stringsAsFactors = FALSE)
                 newenv <- oldenv[-grep(key, oldenv),]
                 write.table(newenv,
                             renv,
@@ -65,11 +65,11 @@ set_environment_variable <- function(key,
             }
             else{
                 tv <- readLines(renv)
-                if(any(grepl(key, tv))){
+                if (any(grepl(key, tv))) {
                     stop(paste0("A ", key, " already exists. ",
                                 "You can overwrite it with the argument ",
                                 "overwrite=TRUE"),
-                         call.=FALSE)
+                         call. = FALSE)
                 }
             }
         }

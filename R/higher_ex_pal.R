@@ -72,7 +72,8 @@ higher_ex_pal <- function(palette = "main",
         Black = "Tableau Azure",
         `Latin@` = "Tableau Olive",
         White = "Tableau Green",
-        `All Other Races` = "Tableau Muave"
+        `All Other Races` = "Tableau Muave",
+        All = "Gray"
     )),
     inverse = higher_ex_cols(
         "White",

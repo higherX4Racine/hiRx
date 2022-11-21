@@ -18,7 +18,7 @@ A tibble that will have more than a million observations.
        \item{value}{a double-precision numeric value}
        \item{footnote_codes}{a one-character code indicating caveats}
    }
-   The \code{series} field contains tese
+   The \code{series} field tracks where the data are from and what they are.
 }
 \description{
 Download a huge table of LAUS observations
