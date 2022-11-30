@@ -21,8 +21,7 @@ a list with 8 elements
 \url{https://yihui.org/knitr/options/}
 }
 \usage{
-rlang::exec(knitr::opts_chunk$set,
-            !!!hiRx::CHUNK_OPTIONS_FOR_KNITR)
+CHUNK_OPTIONS_FOR_KNITR
 }
 \description{
 Standard options for creating a Higher Expectations vignette.

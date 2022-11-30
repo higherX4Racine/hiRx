@@ -4,7 +4,13 @@
 \alias{assign_race_labels}
 \title{Convert the race labels from a data source to Racine race labels}
 \usage{
-assign_race_labels(.x, mapping, ..., target_name = "Race/Ethnicity")
+assign_race_labels(
+  .x,
+  mapping,
+  ...,
+  target_name = "Race/Ethnicity",
+  .levels = hiRx::RACE_LABELS_RACINE
+)
 }
 \arguments{
 \item{.x}{a data frame with a column of race labels}
@@ -14,6 +20,8 @@ assign_race_labels(.x, mapping, ..., target_name = "Race/Ethnicity")
 \item{...}{values for the `by` argument of an `inner_join` between `.x` and `mapping`}
 
 \item{target_name}{optional, defaults to "Race/Ethnicity".}
+
+\item{levels}{optional, the new levels for the Race/Ethnicity factor.}
 }
 \value{
 a new data frame with a factor, `Race/Ethnicity`, of Racine races.

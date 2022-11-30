@@ -15,13 +15,15 @@
 #' @param mapping a data frame that relates the source's labels to Racine's
 #' @param ... values for the `by` argument of an `inner_join` between `.x` and `mapping`
 #' @param target_name optional, defaults to "Race/Ethnicity".
+#' @param levels optional, the new levels for the Race/Ethnicity factor.
 #'
 #' @return a new data frame with a factor, `Race/Ethnicity`, of Racine races.
 #' @export
 assign_race_labels <- function(.x,
                                mapping,
                                ...,
-                               target_name = "Race/Ethnicity"){
+                               target_name = "Race/Ethnicity",
+                               .levels = hiRx::RACE_LABELS_RACINE){
     .by <- .dots_to_by(...)
     .x %>%
         dplyr::inner_join(
@@ -33,6 +35,6 @@ assign_race_labels <- function(.x,
         ) %>%
         dplyr::mutate(
             "{target_name}" := factor(.data[[target_name]],
-                                      levels = hiRx::RACE_LABELS_RACINE)
+                                      levels = .levels)
         )
 }

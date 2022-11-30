@@ -8,7 +8,7 @@
 a tibble with 3 columns:
   \describe{
     \item{Code}{a two-digit character value between 03 and 09}
-    \item{Name}{a name for the measure}
+    \item{Measure}{a name for the measure}
     \item{Description}{a short summary of what the measure quantifies}
   }
 }
