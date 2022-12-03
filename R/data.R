@@ -162,3 +162,32 @@
 #'   }
 #' @source \url{https://download.bls.gov/pub/time.series/la/la.measure}
 "LAUS_MEASURE_MAP"
+
+#' Identifying information for finding HERA schools in the College Scorecard
+#'
+#' The U.S. Department of Education maintains a database of demographic and
+#' performance measures for participating institutions of higher education.
+#' Southeastern Wisconsin has a confederation of such schools, the Higher
+#' Education Regional Alliance.
+#' @format A tibble with 4 columns:
+#'   \describe{
+#'    \item{UNITID}{Integer code for one specific campus/location}
+#'    \item{OPEID6}{Integer code for one IHD, which may have multiple campuses}
+#'    \item{Name}{Text name for the Institution of Higher Education}
+#'    \item{Campus}{Text name for the campus, optional}
+#'   }
+#'  @source \url{https://collegescorecard.ed.gov/data/}
+"HERA_SCHOOLS"
+
+#' Aesthetic and lookup information for three Higher Eds near Racine, WI.
+#'
+#' @format A tibble with 4 columns:
+#'   \describe{
+#'    \item{OPEID6}{Integer code for one IHD, which may have multiple campuses}
+#'    \item{Name}{Text name for the Institution of Higher Education}
+#'    \item{Color}{Text representation of the color for plotting each school}
+#'    \item{Shape}{Integer representation of the shape for plotting each school}
+#'   }
+#'  @source \url{https://collegescorecard.ed.gov/data/}
+"HERA_SCHOOLS_RACINE"
+

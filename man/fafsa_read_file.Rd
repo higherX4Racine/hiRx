@@ -2,7 +2,8 @@
 % Please edit documentation in R/fafsa_read_file.R
 \name{fafsa_read_file}
 \alias{fafsa_read_file}
-\title{Read a file of FAFSA completion data from the US Dept. of Education}
+\title{Copyright (C) 2022 Higher Expectations for Racine County
+Read a file of FAFSA completion data from the US Dept. of Education}
 \usage{
 fafsa_read_file(path)
 }
@@ -13,5 +14,6 @@ fafsa_read_file(path)
 a tibble of helpful information.
 }
 \description{
+Copyright (C) 2022 Higher Expectations for Racine County
 Read a file of FAFSA completion data from the US Dept. of Education
 }
