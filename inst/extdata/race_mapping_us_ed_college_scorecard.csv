@@ -1,0 +1,10 @@
+﻿SOURCE RACE,Long Description,Race/Ethnicity
+HISP,Hispanic students,Latin@
+ASIAN,Asian students,All Other Races
+AIAN,American Indian/Alaska Native students,All Other Races
+NHPI,Native Hawaiian/Pacific Islander students,All Other Races
+2MOR,students of two-or-more-races,All Other Races
+UNKN,students whose race is unknown,All Other Races
+WHITE,white students,White
+BLACK,black students,Black
+ALL,everybody,All

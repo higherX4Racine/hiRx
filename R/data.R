@@ -123,6 +123,20 @@
 #' @source \url{https://palsk8.com/PDF/data-columns/PALS-PreK\%20Data\%20Files\%20Column\%20Headings.pdf}
 "RACE_MAPPING_PALS"
 
+#' Codes that identify race/ethnicity in the U.S. Ed. D.'s College Scorecard
+#'
+#' The United States Department of Education collects a lot of disparate
+#' information into giant tables of "College Scorecards."
+#' @format a tibble with 3 columns:
+#'   \describe{
+#'     \item{SOURCE RACE}{An text abbreviation of the race or ethnicity.}
+#'     \item{Long Description}{A more verbose description of the racial category.}
+#'     \item{Race/Ethnicity}{The broad group for this subgroup in Racine, WI.}
+#'   }
+#' @source \url{https://collegescorecard.ed.gov/data/}
+"RACE_MAPPING_US_ED_COLLEGE_SCORECARD"
+
+
 #' Codes that identify race/ethnicity in WISEDash tables
 #'
 #' WISEDash is the Wisconsin Department of Instruction's data portal. It has
@@ -135,6 +149,21 @@
 #'   }
 #' @source \url{https://dpi.wi.gov/wise/data-elements/race}
 "RACE_MAPPING_WISEDASH"
+
+#' Codes that identify race/ethnicity in COVID data from the WI DHS
+#'
+#' DHS is Wisconsin's Department of Health Services. It has its own set of
+#' racial categories that are similar to, but not identical to, the U.S. Census
+#' Bureau's categories. Crucially, it does not have a "white, non-Hispanic"
+#' racial category. Strictly speaking, that means that Ethnicity and Race
+#' should be two separate variables when dealing with these data.
+#' @format a tibble with 2 columns:
+#'   \describe{
+#'     \item{SOURCE RACE}{The name that the WI DHS uses for this group}
+#'     \item{Race/Ethnicity}{The broad group for this subgroup in Racine, WI.}
+#'   }
+#' @source \url{https://data.dhsgis.wi.gov/}
+"RACE_MAPPING_WI_DHS"
 
 #' Codes that identify race/ethnicity in tables from Teaching Strategies Gold.
 #'
@@ -191,3 +220,8 @@
 #'  @source \url{https://collegescorecard.ed.gov/data/}
 "HERA_SCHOOLS_RACINE"
 
+#' Default columns for importing data from the US College Scorecard
+#'
+#' @format A list of `readr::col_*` specifications.
+#' @source \url{https://collegescorecard.ed.gov/data/}
+"US_ED_COLLEGE_SCORECARD_SPEC"

@@ -15,6 +15,9 @@ collapse_a_factor <- function(.x,
                               collapsed_label,
                               .summary_f = sum,
                               ...) {
+    if (!is.factor(.x[[group_to_collapse]])) {
+        cli::cli_abort(c("!" = "`group_to_collapse` must be a factor"))
+    }
     .x %>%
         dplyr::group_by(
             dplyr::across(!tidyselect::any_of(c(

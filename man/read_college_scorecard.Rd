@@ -4,10 +4,12 @@
 \alias{read_college_scorecard}
 \title{Import data downloaded from the National College Scorecard}
 \usage{
-read_college_scorecard(.path)
+read_college_scorecard(.path, .spec = hiRx::US_ED_COLLEGE_SCORECARD_SPEC)
 }
 \arguments{
 \item{.path}{the full path to the file}
+
+\item{.spec}{a `readr::cols` specification, defaults to institutional graduation rates.}
 }
 \value{
 a data frame / tibble with a lot of juicy detail about enrollment

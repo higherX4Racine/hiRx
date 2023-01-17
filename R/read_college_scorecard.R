@@ -1,19 +1,5 @@
 # Copyright (C) 2022 by Higher Expectations for Racine County
 
-.scorecard_spec <- readr::cols_only(
-    UNITID = readr::col_double(),
-    OPEID6 = readr::col_integer(),
-    HIGHDEG = readr::col_integer(),
-    UG = readr::col_integer(),
-    UGDS = readr::col_integer(),
-    C150_4 = readr::col_double(),
-    C150_L4 = readr::col_double(),
-    D150_4 = readr::col_integer(),
-    D150_L4 = readr::col_integer(),
-    SCUGFFN = readr::col_integer(),
-    ST_FIPS = readr::col_integer(),
-)
-
 #' Import data downloaded from the National College Scorecard
 #'
 #' The U.S. Department of Education maintains a database of information about
@@ -21,10 +7,12 @@
 #' \url{https://collegescorecard.ed.gov/data/}.
 #'
 #' @param .path the full path to the file
+#' @param .spec a `readr::cols` specification, defaults to institutional graduation rates.
 #'
 #' @return a data frame / tibble with a lot of juicy detail about enrollment
 #' @export
-read_college_scorecard <- function(.path){
+read_college_scorecard <- function(.path,
+                                   .spec = hiRx::US_ED_COLLEGE_SCORECARD_SPEC){
     .school_year <- as.integer(
         stringr::str_match(.path,
                            "MERGED(\\d{4})_")[1, 2]
@@ -34,7 +22,7 @@ read_college_scorecard <- function(.path){
         readr::read_csv(
             file = .,
             na = c("", "NA", "NULL"),
-            col_types = .scorecard_spec,
+            col_types = .spec,
             show_col_types = FALSE
         ) %>%
         dplyr::mutate(
