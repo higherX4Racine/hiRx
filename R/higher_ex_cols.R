@@ -13,7 +13,11 @@
     `Tableau Olive` = "#bcb833",
     `Tableau Muave` = "#af5d98",
     `Tableau Sunny` = "#fdbe13",
-    `Tableau Orange` = "#f89620"
+    `Tableau Orange` = "#f89620",
+    `Caledonia Blue` = "#014493",
+    `Mount Pleasant Green` = "#6BB745",
+    `Racine Blue` = "#3C76BE",
+    `Sturtevant Brown` = "#8C7B73"
 )
 
 #' Look up a color from Higher Expectations' palette

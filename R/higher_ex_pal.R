@@ -68,6 +68,12 @@ higher_ex_pal <- function(palette = "main",
         "Gold",
         "White"
     ),
+    municipalities = higher_ex_cols(
+        Caledonia = "Caledonia Blue",
+        `Mount Pleasant` = "Mount Pleasant Green",
+        Racine = "Racine Blue",
+        Sturtevant = "Sturtevant Brown"
+    ),
     race = higher_ex_cols(c(
         Black = "Tableau Azure",
         `Latin@` = "Tableau Olive",

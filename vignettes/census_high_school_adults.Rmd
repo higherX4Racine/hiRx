@@ -1,0 +1,254 @@
+---
+title: "Adults without High School Credentials 5-Year ACS"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Adults without High School Credentials 5-Year ACS}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+rlang::exec(knitr::opts_chunk$set,
+            !!!hiRx::CHUNK_OPTIONS_FOR_KNITR,
+            echo = FALSE)
+
+library(magrittr)
+
+rlang::exec(knitr::opts_chunk$set,
+            !!!hiRx::CHUNK_OPTIONS_FOR_KNITR)
+
+DATA_PATH <- file.path(path.expand("~"),
+                       "Higher Expectations/Data")
+
+SHAPEFILE_PATH <- file.path(DATA_PATH,
+                            "Downloads/Census Shapefiles")
+```
+
+```{r load_places, include = FALSE}
+
+.TRACT_CODES <- unique(hiRx::racine_race_pop_weights_by_tract$tract)
+
+TRACTS <- hiRx::census_tigershapes_combine(
+    list(`2020` = "tl_2020_55_tract.shp"),
+    SHAPEFILE_PATH,
+    stringr::str_detect(.data$COUNTYFP,
+                        "101"),
+    stringr::str_detect(.data$TRACTCE,
+                        paste0(.TRACT_CODES,
+                               collapse = "|"))
+)
+
+MUNIS <- hiRx::census_tigershapes_combine(
+    list(`2020` = "tl_2020_55_cousub.shp"),
+    Sys.getenv("SHAPEFILE_PATH"),
+    .data$COUNTYFP == "101"
+) %>%
+    dplyr::filter(
+        .data$INTPTLON < -87.7,
+        .data$INTPTLON > -87.96
+    ) %>%
+    dplyr::rename(
+        Municipality = "NAME"
+    )
+
+ROADS <- hiRx::census_tigershapes_combine(
+    list(`2022` = "tl_2022_55101_roads.shp"),
+    Sys.getenv("SHAPEFILE_PATH")
+)
+```
+
+```{r find-racine-locations, include = FALSE}
+RACINE_CITY <- dplyr::filter(MUNIS,
+                             .data$Municipality == "Racine")
+
+RACINE_TRACTS <- sf::st_intersection(TRACTS,
+                                     RACINE_CITY$geometry)
+
+RACINE_ROADS <- ROADS %>%
+    sf::st_intersection(
+        RACINE_CITY$geometry,
+        model = "open"
+    ) %>%
+    dplyr::mutate(
+        Length = as.numeric(sf::st_length(.data$geometry))
+    ) %>%
+    dplyr::filter(
+        .data$Length > 100L
+    )
+
+BIG_STREETS <- RACINE_ROADS %>%
+    dplyr::filter(
+        stringr::str_detect(.data$FULLNAME,
+                            paste0(c("16th St",
+                                     "21st St",
+                                     "Douglas Ave",
+                                     "Drexel Ave",
+                                     "Erie St",
+                                     "Goold St",
+                                     "Hamilton St",
+                                     "High St",
+                                     "Kinzie Ave",
+                                     "Lathrop Ave",
+                                     "Main St",
+                                     "Marquette St",
+                                     "Melvin Ave",
+                                     "Northwestern Ave",
+                                     "Racine St",
+                                     "Rapids Dr",
+                                     "S Green Bay Rd",
+                                     "South St",
+                                     "Spring St",
+                                     "State St",
+                                     "Taylor Ave",
+                                     "Washington Ave",
+                                     "West Blvd"),
+                                   collapse = "|"))
+    )
+
+```
+
+```{r define_acs_table, include = FALSE}
+
+SEXES <- tibble::tibble(
+    Sex = c("Female", "Male"),
+    offset = c(43L, 2L)
+)
+
+AGES <- tibble::tibble(
+    `Minimum Age` = c(18L, 25L, 35L, 45L, 65L),
+    offset = seq(1L, 35L, by = 8L)
+)
+
+
+LEVELS <- tibble::tribble(
+    ~ `Credential Level`, ~ `Credential Label`, ~ `Census Label`,
+    1L, "None",                     "Less than 9th grade",
+    1L, "None",                     "9th to 12th grade, no diploma",
+    2L, "High School Diploma",      "High school graduate (includes equivalency)",
+    2L, "High School Diploma",      "Some college, no degree",
+    3L, "Associate's Degree",       "Associate's degree",
+    4L, "Bachelor's Degree",        "Bachelor's degree",
+    5L, "Postbaccalaureate Degree", "Graduate or professional degree"
+) %>%
+    dplyr::mutate(
+        offset = seq_along(.data$`Credential Label`)
+    )
+
+ATTAINMENT_VARS <- hiRx::census_expand_factors(
+    SEXES,
+    AGES,
+    LEVELS
+) %>%
+    dplyr::mutate(
+        Variable = hiRx::census_build_acs_variable(table_code = "B15001",
+                                                   race_code = "",
+                                                   item_number = .data$Index)
+    )
+
+```
+
+```{r acquire_acs_data, include = FALSE}
+RAW_ATTAINMENT_DATA <- ATTAINMENT_VARS %>%
+    dplyr::filter(
+        .data$`Credential Level` == 1L
+    ) %>%
+    hiRx::census_safe_api_query(
+        for_geo = "tract",
+        for_items = paste0(.TRACT_CODES,
+                           collapse = ","),
+        survey_type = "acs",
+        survey_or_table_code = "acs5",
+        year = 2020L,
+        state = 55L,
+        county = 101L
+)
+```
+
+```{r wrangle_acs_data, include = FALSE}
+ATTAINMENT_DATA <- RAW_ATTAINMENT_DATA %>%
+    hiRx::census_wrangle_lists_of_raw_json(
+        ATTAINMENT_VARS
+    ) %>%
+    dplyr::group_by(
+        .data$tract
+    ) %>%
+    dplyr::summarize(
+        `Adults without HS Diplomas` = sum(.data$Population,
+                                           na.rm = TRUE),
+        .groups = "keep"
+    ) %>%
+    dplyr::ungroup() %>%
+    dplyr::inner_join(
+        TRACTS,
+        by = c(tract = "TRACTCE")
+    )
+```
+
+```{r map_attainment_tract, fig.dim = c(7, 7)}
+ATTAINMENT_DATA %>%
+    sf::st_as_sf() %>%
+    ggplot2::ggplot() +
+    ggplot2::geom_sf(
+        mapping = ggplot2::aes(fill = .data$`Adults without HS Diplomas`)
+    ) +
+    ggplot2::geom_sf(
+        data = MUNIS,
+        col = "red",
+        fill = NA
+    ) +
+    ggplot2::geom_sf_text(
+        mapping = ggplot2::aes(label = .data$`Adults without HS Diplomas`),
+        color = "white",
+        size = 3
+    ) +
+    ggplot2::scale_x_continuous(
+        name = NULL,
+        breaks = seq(-87.9, -87.7, by = 0.1)
+    ) +
+    ggplot2::scale_y_continuous(
+        name = NULL,
+        breaks = seq(42.65, 42.85, by = 0.05)
+    ) +
+    ggplot2::theme(
+        legend.position = "top"
+    )
+```
+
+```{r map_attainment_in_racine, fig.dim = c(20, 20)}
+RACINE_TRACTS %>%
+    dplyr::left_join(
+        ATTAINMENT_DATA %>%
+            dplyr::select("tract",
+                          "Adults without HS Diplomas"),
+        by = c(TRACTCE = "tract")
+    ) %>%
+    sf::st_as_sf() %>%
+    ggplot2::ggplot() +
+    ggplot2::geom_sf(
+        color = rgb(0, 0.5, 0.79, 0.5), # this is "Medium Blue" with alpha
+        fill = NA,
+        size = 2
+    ) +
+    ggplot2::geom_sf(
+        data = RACINE_ROADS,
+        col = rgb(0.2, 0.2, 0.2),
+        fill = NA
+    ) +
+    ggplot2::geom_sf(
+        data = BIG_STREETS,
+        size = 1.5
+    ) +
+    ggplot2::geom_sf_label(
+        data = BIG_STREETS,
+        mapping = ggplot2::aes(label = .data$FULLNAME),
+        position = "nudge",
+        size = 2
+    ) +
+    ggplot2::geom_sf_label(
+        mapping = ggplot2::aes(label = .data$`Adults without HS Diplomas`),
+        position = "nudge",
+        color = hiRx::higher_ex_cols("Medium Blue"),
+        size = 4
+    ) +
+    ggplot2::theme_void()
+```
