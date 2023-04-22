@@ -28,11 +28,9 @@ library(hiRx)
 ```
 
 ```{r load_geographies}
-DATA_PATH <- file.path(path.expand("~"),
-                       "Higher Expectations/Data/Downloads")
+DATA_PATH <- hiRx::input_path("Downloads")
 
-SHAPEFILE_PATH <- file.path(DATA_PATH,
-                            "Census Shapefiles",
+SHAPEFILE_PATH <- file.path(Sys.getenv("SHAPEFILE_PATH"),
                             "2020")
 
 racine_city <- file.path(SHAPEFILE_PATH,
@@ -132,14 +130,13 @@ health_variables <- census_details %>%
 ```
 
 ```{r health_by_tract}
-health_by_tract <- acs5_query_url(2020,
-                health_variables$variable,
-                "tract",
-                racine_tracts$TRACTCE,
-                state = 55,
-                county = 101) %>%
-    jsonlite::read_json() %>%
-    tibble_from_json() %>%
+health_by_tract <- hiRx::acs5_query_url(2020,
+                                        health_variables$variable,
+                                        "tract",
+                                        racine_tracts$TRACTCE,
+                                        state = 55,
+                                        county = 101) %>%
+    hiRx::census_json_to_tibble() %>%
     tidyr::pivot_longer(
         cols = !c(.data$state, .data$county, .data$tract),
         names_to = "variable",

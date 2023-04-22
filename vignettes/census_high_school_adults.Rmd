@@ -225,7 +225,7 @@ RACINE_TRACTS %>%
     sf::st_as_sf() %>%
     ggplot2::ggplot() +
     ggplot2::geom_sf(
-        color = rgb(0, 0.5, 0.79, 0.5), # this is "Medium Blue" with alpha
+        color = ggplot2::alpha(hiRx::higher_ex_cols("Medium Blue"), 0.5),
         fill = NA,
         size = 2
     ) +

@@ -28,11 +28,9 @@ library(hiRx)
 ```
 
 ```{r load_shapefiles}
-DATA_PATH <- file.path(path.expand("~"),
-                       "Higher Expectations/Data/Downloads")
+DATA_PATH <- hiRx::input_path("Downloads")
 
-SHAPEFILE_PATH <- file.path(DATA_PATH,
-                            "Census Shapefiles",
+SHAPEFILE_PATH <- file.path(Sys.getenv("SHAPEFILE_PATH"),
                             "2020")
 
 racine_city <- file.path(SHAPEFILE_PATH,

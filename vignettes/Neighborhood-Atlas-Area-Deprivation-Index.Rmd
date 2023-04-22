@@ -1,0 +1,359 @@
+---
+title: "Neighborhood-Atlas-Area-Deprivation-Index"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Neighborhood-Atlas-Area-Deprivation-Index}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+
+library(magrittr)
+
+rlang::exec(knitr::opts_chunk$set,
+            hiRx::CHUNK_OPTIONS_FOR_KNITR)
+
+.WHOLE_US <- "The Rest of the Country"
+.STATE_NAME <- "Wisconsin"
+.COUNTY_NAME <- "Racine County"
+.STATE_FIPS <- 55L
+.COUNTY_FIPS <- 101L
+
+
+```
+
+## Data Acquisition
+
+### Neighborhood Atlas of Area Deprivation
+
+The Atlas' authors prefer that we log in and download the data from them.
+I'm sure that helps them with their metrics for grant compliance, so you should do that!
+Go to the Neighborhood Atlas [website][neighborhood-atlas].
+Create an account.
+Download the national Block-Group level Deprivation Index data.
+Change the `.DATA_FILE` statement below to point to your data file.
+
+```{r adi_data_file}
+.DATA_FILE <- hiRx::input_path("Downloads",
+                              "US_2020_ADI_Census Block Group_v3.2.csv")
+
+```
+
+### Shapefiles of Census Block Groups
+
+I acquired my shapefiles from the US Census Tiger/Line service.
+[This link][tigerline] should take you right to a form where you can choose to download all of the block group shapes for one state.
+I am in Wisconsin and use that.
+You could (should?) pick your own state.
+You'll need to unzip the contents, keep them together, and point R at the "shp" file.
+
+```{r tigerline_data_file}
+
+.SHAPEFILE <- Sys.getenv("SHAPEFILE_PATH") %>%
+    file.path(
+        "2020",
+        "tl_2020_55_bg.shp"
+    )
+
+```
+
+## Data Wrangling
+
+### Data Format
+
+The file has five fields, and each line describes one census block group.
+The first is a sequential index that seems safe to ignore.
+The second is the FIPS-based code for joining these data to a shapefile from the [National Historical Geographic Information System][nhgis].
+The third is the national percentile ranking of the area deprivation index.
+The fourth is the within-state decile ranking of the area deprivation index.
+The fifth is the GEOID code of the block group.
+
+```{r file_format_definitions}
+
+.FIELD_TYPES <- readr::cols(
+    OBJECTID = readr::col_skip(),
+    GISJOIN = readr::col_character(),
+    ADI_NATRANK = readr::col_integer(),
+    ADI_STATERNK = readr::col_integer(),
+    FIPS = readr::col_character()
+)
+
+```
+
+Both the `ADI_NATRANK` and `ADI_STATERANK` fields contain missing values.
+These data are not necessarily missing, but have been suppressed for privacy or data quality reasons.
+I'm not entirely sure what the codes mean, although the authors do give at least a [partial explanation][na-explanation].
+for blocks when the data from the census block group needed to be suppressed to protect the privacy of its residents.
+The item names in the array below make a guess here about what the codes mean, but it doesn't really matter what they are because I am going to convert them all to `NA`s anyway.
+
+```{r suppressed_data_definitions}
+
+.SUPPRESSED_VALUES <-  c(
+    `Group Quarters` = "GQ",
+    `Too Few Housing Units` = "PH",
+    `Both` = "GQ-PH",
+    `Fewer than 100 People` = "QDI"
+)
+
+```
+
+The GEOID code is a string that contains four integers that are also FIPS codes.
+The US Census Bureau has a good [explanation][census-fips-explanation] of the layout.
+Each of the four component codes is padded on the left with zeros to maintain consistent spacing.
+The first two digits are the block groups' state FIPS codes.
+The next three digits are county.
+The next six are the census tract.
+The final digit is the block group.
+
+```{r geoid_code_definitions}
+
+.GEOID_PARTS <- c(
+    "State",
+    "County",
+    "Tract",
+    "Block Group"
+)
+
+.GEOID_BREAKS <- cumsum(c(
+    2L,
+    3L,
+    6L
+))
+
+```
+
+### Actually Read the ADI Data
+
+Now that we have defined all of the parameters for importing and wrangling the data, we can do so.
+Note that we are removing the block groups with suppressed data.
+
+```{r read_adi_data}
+
+ADI_BY_BG <- .DATA_FILE %>%
+    readr::read_csv(
+        file = .,
+        col_types = .FIELD_TYPES,
+        na = .SUPPRESSED_VALUES
+    ) %>%
+    dplyr::filter(
+        !is.na(.data$ADI_NATRANK),
+        !is.na(.data$ADI_STATERNK)
+    ) %>%
+    dplyr::rename(
+        GEOID = "FIPS"
+    ) %>%
+    tidyr::separate(
+        col = .data$GEOID,
+        into = .GEOID_PARTS,
+        sep = .GEOID_BREAKS,
+        convert = TRUE,
+        remove = FALSE
+    )
+
+```
+
+### Load Census Block Group Map Data
+
+Next, let's read in some shapefiles so we can make a map.
+We'll mutate the data so that the tacky character-typed FIPS fields are wholesome and useful integers.
+We'll also make some of the column names more human-readable.
+
+```{r import_shapefiles}
+
+SIMPLE_FEATURES_BY_BG <- .SHAPEFILE %>%
+    sf::read_sf() %>%
+    dplyr::filter(
+        .data$AWATER < 1e8
+    ) %>%
+    dplyr::mutate(
+        dplyr::across(tidyselect::all_of(c("STATEFP",
+                                           "COUNTYFP",
+                                           "TRACTCE",
+                                           "BLKGRPCE")),
+                      readr::parse_integer)
+    ) %>%
+    dplyr::rename(
+        State = "STATEFP",
+        County = "COUNTYFP",
+        Tract = "TRACTCE",
+        `Block Group` = "BLKGRPCE",
+    )
+```
+
+### Filter and Join the ADI and Shapefile Data
+
+We can't plot the whole country, that would take to long.
+Let's pick a US County at random ... Racine County, WI!
+Coincidentally, I just happen to know that Wisconsin's FIPS code is 55 and Racine County's is 101.
+Feel free to substitute your own state and county codes
+
+```{r just_one_county}
+
+COUNTY <- dplyr::left_join(
+    dplyr::filter(SIMPLE_FEATURES_BY_BG,
+                  .data$State == .STATE_FIPS,
+                  .data$County == .COUNTY_FIPS),
+    dplyr::filter(ADI_BY_BG,
+                  .data$State == .STATE_FIPS,
+                  .data$County == .COUNTY_FIPS),
+    by = c("State",
+           "County",
+           "Tract",
+           "Block Group",
+           "GEOID")
+)
+
+```
+
+## Visualize
+
+There are some common settings that we're going to use in several plots.
+We will focus on each block group's national percentile position in the Area Deprivation Index.
+It should be more sensitive to local conditions because it is finer-grained than the state decile.
+Unless, perhaps, you live in Wyoming or Delaware.
+
+```{r settings_for_graphing_adi_natrank}
+
+generic_settings <- list(
+    ggplot2::theme_minimal(),
+    ggplot2::theme(
+        legend.position = "top"
+    )
+)
+
+national_rank_axis = list(
+    ggplot2::scale_y_continuous(
+        name = "National Percentile of ADI",
+        labels = scales::label_percent(accuracy = 1,
+                                       scale = 1),
+        limits = c(0, 100)
+    )
+)
+
+national_rank_gradient_settings <- list(
+    limits = c(0, 100),
+    midpoint = 50,
+    low = hiRx::higher_ex_cols("Medium Blue"),
+    mid = ggplot2::alpha(hiRx::higher_ex_cols("Gray"),
+                         alpha = 0.2),
+    high = hiRx::higher_ex_cols("Gold"),
+    na.value = ggplot2::alpha(hiRx::higher_ex_cols("Tableau Muave"),
+                              alpha = 0.1)
+)
+
+```
+
+### A Sanity-check Scatterplot of National Data
+
+The two quantile fields, National Percentile and State Decile, will obviously be correlated.
+We'll plot them anyway just to highlight that we will be focusing on our county within our state.
+
+```{r quantile_plot}
+
+ADI_BY_BG %>%
+    dplyr::mutate(
+        Color = factor(
+            dplyr::case_when(
+                .data$State == .STATE_FIPS &
+                    .data$County == .COUNTY_FIPS
+                ~ .COUNTY_NAME,
+                .data$State == .STATE_FIPS ~ .STATE_NAME,
+                TRUE ~ .WHOLE_US
+            ),
+            levels = c(.WHOLE_US, .STATE_NAME, .COUNTY_NAME)
+        )
+    ) %>%
+    dplyr::arrange(
+        .data$Color
+    ) %>%
+    ggplot2::ggplot(ggplot2::aes(
+        x = .data$ADI_STATERNK,
+        y = .data$ADI_NATRANK,
+        color = .data$Color
+    )) +
+    ggplot2::geom_point() +
+    ggplot2::scale_x_continuous(
+        name = "State Percentile of ADI",
+        labels = scales::label_percent(accuracy = 1,
+                                       scale = 10)
+    ) +
+    national_rank_axis +
+    ggplot2::scale_color_manual(
+        name = NULL,
+        values = rlang::set_names(
+            c(
+                ggplot2::alpha(hiRx::higher_ex_cols("Gray"),
+                               alpha = 1/128),
+                ggplot2::alpha("red",
+                               alpha = 10/128),
+                hiRx::higher_ex_cols("Navy")
+            ),
+            nm = c(.WHOLE_US, .STATE_NAME, .COUNTY_NAME)
+        )
+    ) +
+    generic_settings
+
+```
+
+### A Sanity Check Scatterplot of County Data
+
+Before we draw the map, lets make sure things seem OK by plotting land area by ADI.
+It won't look like there's a problem, now, but prepping for this image helped me refine a lot of the wrangling code above.
+
+```{r area_by_adi_in_county}
+
+COUNTY %>%
+    ggplot2::ggplot(ggplot2::aes(
+        x = .data$ALAND,
+        y = .data$ADI_NATRANK,
+        color = .data$ADI_NATRANK
+    )) +
+    ggplot2::geom_point(
+        show.legend = FALSE
+    ) +
+    ggplot2::scale_x_continuous(
+        name = "Block Group Land Area (sq. km.)",
+        labels = scales::label_number(accuracy = 0.1,
+                                      scale = 1e-6),
+        trans = "log10"
+    ) +
+    national_rank_axis +
+    rlang::exec(
+        ggplot2::scale_color_gradient2,
+        name = NULL,
+        !!!national_rank_gradient_settings
+    ) +
+    generic_settings
+
+```
+
+### Draw the Chloropleth Map
+
+As you may have noticed above, we like to color our maps with a yellow-gray-blue gradient.
+Yellow, like the abdomen of many a wasp, indicates "Watch Out!".
+Gray values are intermediate.
+A soothing blue indicates areas where the system indicator suggests prosperity.
+You can really see the benefit of re-using settings in this code block.
+
+```{r map_adi_in_county}
+
+COUNTY %>%
+    ggplot2::ggplot(ggplot2::aes(
+        fill = .data$ADI_NATRANK
+    )) +
+    ggplot2::geom_sf() +
+    rlang::exec(
+        ggplot2::scale_fill_gradient2,
+        name = "National Percentile of ADI",
+        !!!national_rank_gradient_settings
+    ) +
+    generic_settings
+
+```
+
+[neighborhood-atlas]: https://www.neighborhoodatlas.medicine.wisc.edu/
+[tigerline]: https://www.census.gov/cgi-bin/geo/shapefiles/index.php?year=2020&layergroup=Block+Groups
+[nhgis]: https://www.nhgis.org/
+[na-explanation]: https://www.neighborhoodatlas.medicine.wisc.edu/changelog
+[census-fips-explanation]: https://www.census.gov/programs-surveys/geography/technical-documentation/records-layout/2020-census-block-record-layout.html
