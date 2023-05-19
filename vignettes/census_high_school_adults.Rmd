@@ -12,16 +12,8 @@ rlang::exec(knitr::opts_chunk$set,
             !!!hiRx::CHUNK_OPTIONS_FOR_KNITR,
             echo = FALSE)
 
-library(magrittr)
-
-rlang::exec(knitr::opts_chunk$set,
-            !!!hiRx::CHUNK_OPTIONS_FOR_KNITR)
-
-DATA_PATH <- file.path(path.expand("~"),
-                       "Higher Expectations/Data")
-
-SHAPEFILE_PATH <- file.path(DATA_PATH,
-                            "Downloads/Census Shapefiles")
+SHAPEFILE_PATH <- hiRx::input_path("Downloads",
+                                   "Census Shapefiles")
 ```
 
 ```{r load_places, include = FALSE}
@@ -42,11 +34,11 @@ MUNIS <- hiRx::census_tigershapes_combine(
     list(`2020` = "tl_2020_55_cousub.shp"),
     Sys.getenv("SHAPEFILE_PATH"),
     .data$COUNTYFP == "101"
-) %>%
+) |>
     dplyr::filter(
         .data$INTPTLON < -87.7,
         .data$INTPTLON > -87.96
-    ) %>%
+    ) |>
     dplyr::rename(
         Municipality = "NAME"
     )
@@ -64,19 +56,19 @@ RACINE_CITY <- dplyr::filter(MUNIS,
 RACINE_TRACTS <- sf::st_intersection(TRACTS,
                                      RACINE_CITY$geometry)
 
-RACINE_ROADS <- ROADS %>%
+RACINE_ROADS <- ROADS |>
     sf::st_intersection(
         RACINE_CITY$geometry,
         model = "open"
-    ) %>%
+    ) |>
     dplyr::mutate(
         Length = as.numeric(sf::st_length(.data$geometry))
-    ) %>%
+    ) |>
     dplyr::filter(
         .data$Length > 100L
     )
 
-BIG_STREETS <- RACINE_ROADS %>%
+BIG_STREETS <- RACINE_ROADS |>
     dplyr::filter(
         stringr::str_detect(.data$FULLNAME,
                             paste0(c("16th St",
@@ -129,7 +121,7 @@ LEVELS <- tibble::tribble(
     3L, "Associate's Degree",       "Associate's degree",
     4L, "Bachelor's Degree",        "Bachelor's degree",
     5L, "Postbaccalaureate Degree", "Graduate or professional degree"
-) %>%
+) |>
     dplyr::mutate(
         offset = seq_along(.data$`Credential Label`)
     )
@@ -138,7 +130,7 @@ ATTAINMENT_VARS <- hiRx::census_expand_factors(
     SEXES,
     AGES,
     LEVELS
-) %>%
+) |>
     dplyr::mutate(
         Variable = hiRx::census_build_acs_variable(table_code = "B15001",
                                                    race_code = "",
@@ -148,10 +140,10 @@ ATTAINMENT_VARS <- hiRx::census_expand_factors(
 ```
 
 ```{r acquire_acs_data, include = FALSE}
-RAW_ATTAINMENT_DATA <- ATTAINMENT_VARS %>%
+RAW_ATTAINMENT_DATA <- ATTAINMENT_VARS |>
     dplyr::filter(
         .data$`Credential Level` == 1L
-    ) %>%
+    ) |>
     hiRx::census_safe_api_query(
         for_geo = "tract",
         for_items = paste0(.TRACT_CODES,
@@ -165,19 +157,19 @@ RAW_ATTAINMENT_DATA <- ATTAINMENT_VARS %>%
 ```
 
 ```{r wrangle_acs_data, include = FALSE}
-ATTAINMENT_DATA <- RAW_ATTAINMENT_DATA %>%
+ATTAINMENT_DATA <- RAW_ATTAINMENT_DATA |>
     hiRx::census_wrangle_lists_of_raw_json(
         ATTAINMENT_VARS
-    ) %>%
+    ) |>
     dplyr::group_by(
         .data$tract
-    ) %>%
+    ) |>
     dplyr::summarize(
         `Adults without HS Diplomas` = sum(.data$Population,
                                            na.rm = TRUE),
         .groups = "keep"
-    ) %>%
-    dplyr::ungroup() %>%
+    ) |>
+    dplyr::ungroup() |>
     dplyr::inner_join(
         TRACTS,
         by = c(tract = "TRACTCE")
@@ -185,8 +177,8 @@ ATTAINMENT_DATA <- RAW_ATTAINMENT_DATA %>%
 ```
 
 ```{r map_attainment_tract, fig.dim = c(7, 7)}
-ATTAINMENT_DATA %>%
-    sf::st_as_sf() %>%
+ATTAINMENT_DATA |>
+    sf::st_as_sf() |>
     ggplot2::ggplot() +
     ggplot2::geom_sf(
         mapping = ggplot2::aes(fill = .data$`Adults without HS Diplomas`)
@@ -215,19 +207,19 @@ ATTAINMENT_DATA %>%
 ```
 
 ```{r map_attainment_in_racine, fig.dim = c(20, 20)}
-RACINE_TRACTS %>%
+RACINE_TRACTS |>
     dplyr::left_join(
-        ATTAINMENT_DATA %>%
+        ATTAINMENT_DATA |>
             dplyr::select("tract",
                           "Adults without HS Diplomas"),
         by = c(TRACTCE = "tract")
-    ) %>%
-    sf::st_as_sf() %>%
+    ) |>
+    sf::st_as_sf() |>
     ggplot2::ggplot() +
     ggplot2::geom_sf(
         color = ggplot2::alpha(hiRx::higher_ex_cols("Medium Blue"), 0.5),
         fill = NA,
-        size = 2
+        size = 4.0
     ) +
     ggplot2::geom_sf(
         data = RACINE_ROADS,

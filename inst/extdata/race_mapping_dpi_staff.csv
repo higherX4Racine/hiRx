@@ -1,4 +1,4 @@
-﻿SOURCE RACE,Description,Race/Ethnicity
+SOURCE RACE,Description,Race/Ethnicity
 A,Asian,All Other Races
 B,Black - African American,Black
 H,Hispanic or Latino,Latin@
@@ -6,4 +6,4 @@ I,American Indian - Alaskan Native,All Other Races
 P,Native Hawaiian Pacific Islander,All Other Races
 T,Two or More Races,All Other Races
 W,White,White
-"""""",Total,All
+,Total,All

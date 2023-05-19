@@ -2,7 +2,7 @@
 #'
 #' @param ... arguments to be quoted and printed
 #'
-#' @return
+#' @return nothing, it just prints things
 #' @export
 #'
 #' @importFrom magrittr %>%

@@ -4,14 +4,7 @@ RACE_MAPPING_US_ED_COLLEGE_SCORECARD <- system.file(
     "extdata",
     "race_mapping_us_ed_college_scorecard.csv",
     package = "hiRx"
-) %>%
-    readr::read_csv(
-        file = .,
-        col_names = TRUE,
-        col_types = readr::cols(.default = readr::col_character()),
-        show_col_types = FALSE
-    )
-
-
+) |>
+    read_race_mapping()
 
 usethis::use_data(RACE_MAPPING_US_ED_COLLEGE_SCORECARD, overwrite = TRUE)
