@@ -9,7 +9,7 @@ Description: This is probably going to be a meta-package, eventually.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 Suggests: 
     rmarkdown,
     testthat (>= 3.0.0),

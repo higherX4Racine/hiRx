@@ -19,6 +19,4 @@
 #' with those formats. They are a good place to start when wrangling data from
 #' new sources
 #'
-#' @docType package
-#' @name hiRx
-NULL
+"_PACKAGE"
