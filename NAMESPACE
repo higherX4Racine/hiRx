@@ -2,6 +2,7 @@
 
 export("%>%")
 export(CHUNK_OPTIONS_FOR_KNITR)
+export(academic_year_from_month)
 export(aggregate_over_races)
 export(annotation_table)
 export(assign_race_labels)
