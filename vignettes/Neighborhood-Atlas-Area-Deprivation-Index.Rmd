@@ -238,7 +238,7 @@ national_rank_gradient_settings <- list(
     mid = ggplot2::alpha(hiRx::higher_ex_cols("Gray"),
                          alpha = 0.2),
     high = hiRx::higher_ex_cols("Gold"),
-    na.value = ggplot2::alpha(hiRx::higher_ex_cols("Tableau Muave"),
+    na.value = ggplot2::alpha(hiRx::higher_ex_cols("Tableau Mauve"),
                               alpha = 0.1)
 )
 

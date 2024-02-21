@@ -11,7 +11,7 @@
     `Tableau Green` = "#159a48",
     `Tableau Azure` = "#0a4e8d",
     `Tableau Olive` = "#bcb833",
-    `Tableau Muave` = "#af5d98",
+    `Tableau Mauve` = "#af5d98",
     `Tableau Sunny` = "#fdbe13",
     `Tableau Orange` = "#f89620",
     `Caledonia Blue` = "#014493",

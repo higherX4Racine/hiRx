@@ -78,7 +78,7 @@ higher_ex_pal <- function(palette = "main",
         Black = "Tableau Azure",
         `Latin@` = "Tableau Olive",
         White = "Tableau Green",
-        `All Other Races` = "Tableau Muave",
+        `All Other Races` = "Tableau Mauve",
         All = "Gray"
     )),
     inverse = higher_ex_cols(
@@ -90,7 +90,7 @@ higher_ex_pal <- function(palette = "main",
         "Tableau Azure",
         "Tableau Orange",
         "Tableau Green",
-        "Tableau Muave"),
+        "Tableau Mauve"),
     `navy gradient` = higher_ex_cols(
         "Navy",
         "Navy Green",
