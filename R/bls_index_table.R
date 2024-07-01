@@ -25,14 +25,13 @@ BLS_INDEX_TABLE_SEP <- "\\."
 #'         \item{Place}{more detail about what the table's data describe}
 #'     }
 #' @export
-#' @importFrom magrittr %>%
 bls_index_table <- function(table_path) {
 
     file.path(BLS_DOMAIN,
-              table_path) %>%
-        xml2::read_html() %>%
-        rvest::html_element(css = BLS_INDEX_ELEMENT) %>%
-        rvest::html_text2() %>%
+              table_path) |>
+        xml2::read_html() |>
+        rvest::html_element(css = BLS_INDEX_ELEMENT) |>
+        rvest::html_text2() |>
         readr::read_fwf(
             col_positions = readr::fwf_widths(
                 widths = BLS_INDEX_WIDTHS,
@@ -46,7 +45,7 @@ bls_index_table <- function(table_path) {
             skip = 2,
             trim_ws = TRUE,
             na = BLS_INDEX_NA_VALUES
-        ) %>%
+        ) |>
         tidyr::separate(
             {{ BLS_INDEX_TABLE_FIELD }},
             into = BLS_INDEX_TABLE_PARTS,

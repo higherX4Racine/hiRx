@@ -12,8 +12,7 @@ rlang::exec(knitr::opts_chunk$set,
             !!!hiRx::CHUNK_OPTIONS_FOR_KNITR,
             echo = FALSE)
 
-SHAPEFILE_PATH <- hiRx::input_path("Downloads",
-                                   "Census Shapefiles")
+SHAPEFILE_PATH <- Sys.getenv("SHAPEFILE_PATH")
 ```
 
 ```{r load_places, include = FALSE}
@@ -21,7 +20,7 @@ SHAPEFILE_PATH <- hiRx::input_path("Downloads",
 .TRACT_CODES <- unique(hiRx::racine_race_pop_weights_by_tract$tract)
 
 TRACTS <- hiRx::census_tigershapes_combine(
-    list(`2020` = "tl_2020_55_tract.shp"),
+    list(`2020` = "tl_2020_55_tract"),
     SHAPEFILE_PATH,
     stringr::str_detect(.data$COUNTYFP,
                         "101"),
@@ -31,7 +30,7 @@ TRACTS <- hiRx::census_tigershapes_combine(
 )
 
 MUNIS <- hiRx::census_tigershapes_combine(
-    list(`2020` = "tl_2020_55_cousub.shp"),
+    list(`2020` = "tl_2020_55_cousub"),
     Sys.getenv("SHAPEFILE_PATH"),
     .data$COUNTYFP == "101"
 ) |>
@@ -44,7 +43,7 @@ MUNIS <- hiRx::census_tigershapes_combine(
     )
 
 ROADS <- hiRx::census_tigershapes_combine(
-    list(`2022` = "tl_2022_55101_roads.shp"),
+    list(`2022` = "tl_2022_55101_roads"),
     Sys.getenv("SHAPEFILE_PATH")
 )
 ```

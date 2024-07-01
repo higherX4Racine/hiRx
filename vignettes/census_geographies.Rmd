@@ -34,37 +34,38 @@ SHAPEFILE_PATH <- file.path(Sys.getenv("SHAPEFILE_PATH"),
                             "2020")
 
 racine_city <- file.path(SHAPEFILE_PATH,
-                         "tl_2020_55_cousub.shp") %>%
-    sf::st_read() %>%
+                         "tl_2020_55_cousub") |>
+    sf::st_read() |>
     dplyr::filter(
         .data$COUSUBFP == "66000"
-    ) %>%
+    ) |>
     dplyr::select(
         where(~ !is.na(.))
     )
 
 rusd <- file.path(SHAPEFILE_PATH,
-                  "tl_2020_55_unsd.shp") %>%
-    sf::st_read() %>%
+                  "tl_2020_55_unsd") |>
+    sf::st_read() |>
     dplyr::filter(
         .data$UNSDLEA == "12360"
-    ) %>%
+    ) |>
     dplyr::select(
         where(~ !is.na(.))
     )
 
 county_blocks <- file.path(SHAPEFILE_PATH,
-                           "tl_2020_55_tabblock20.shp") %>%
-    sf::st_read() %>%
-    dplyr::rename_with(stringr::str_remove,
-                       pattern = "20$") %>%
+                           "tl_2020_55_tabblock20") |>
+    sf::st_read() |>
+    dplyr::rename_with(
+        ~ stringr::str_remove(., pattern = "20$")
+    ) |>
     dplyr::filter(
         .data$COUNTYFP == "101"
-    ) %>%
+    ) |>
     dplyr::mutate(
         BLKGRPID = stringr::str_sub(.data$GEOID,
                                     end = 12)
-    ) %>%
+    ) |>
     only_informative_columns()
 ```
 

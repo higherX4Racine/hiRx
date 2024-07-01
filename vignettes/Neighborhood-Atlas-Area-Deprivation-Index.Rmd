@@ -50,10 +50,10 @@ You'll need to unzip the contents, keep them together, and point R at the "shp" 
 
 ```{r tigerline_data_file}
 
-.SHAPEFILE <- Sys.getenv("SHAPEFILE_PATH") %>%
+.SHAPEFILE <- Sys.getenv("SHAPEFILE_PATH") |>
     file.path(
         "2020",
-        "tl_2020_55_bg.shp"
+        "tl_2020_55_bg"
     )
 
 ```
@@ -130,19 +130,19 @@ Note that we are removing the block groups with suppressed data.
 
 ```{r read_adi_data}
 
-ADI_BY_BG <- .DATA_FILE %>%
+ADI_BY_BG <- .DATA_FILE |>
     readr::read_csv(
-        file = .,
+        file = _,
         col_types = .FIELD_TYPES,
         na = .SUPPRESSED_VALUES
-    ) %>%
+    ) |>
     dplyr::filter(
         !is.na(.data$ADI_NATRANK),
         !is.na(.data$ADI_STATERNK)
-    ) %>%
+    ) |>
     dplyr::rename(
         GEOID = "FIPS"
-    ) %>%
+    ) |>
     tidyr::separate(
         col = .data$GEOID,
         into = .GEOID_PARTS,
@@ -161,18 +161,18 @@ We'll also make some of the column names more human-readable.
 
 ```{r import_shapefiles}
 
-SIMPLE_FEATURES_BY_BG <- .SHAPEFILE %>%
-    sf::read_sf() %>%
+SIMPLE_FEATURES_BY_BG <- .SHAPEFILE |>
+    sf::read_sf() |>
     dplyr::filter(
         .data$AWATER < 1e8
-    ) %>%
+    ) |>
     dplyr::mutate(
         dplyr::across(tidyselect::all_of(c("STATEFP",
                                            "COUNTYFP",
                                            "TRACTCE",
                                            "BLKGRPCE")),
                       readr::parse_integer)
-    ) %>%
+    ) |>
     dplyr::rename(
         State = "STATEFP",
         County = "COUNTYFP",
@@ -251,7 +251,7 @@ We'll plot them anyway just to highlight that we will be focusing on our county 
 
 ```{r quantile_plot}
 
-ADI_BY_BG %>%
+ADI_BY_BG |>
     dplyr::mutate(
         Color = factor(
             dplyr::case_when(
@@ -263,10 +263,10 @@ ADI_BY_BG %>%
             ),
             levels = c(.WHOLE_US, .STATE_NAME, .COUNTY_NAME)
         )
-    ) %>%
+    ) |>
     dplyr::arrange(
         .data$Color
-    ) %>%
+    ) |>
     ggplot2::ggplot(ggplot2::aes(
         x = .data$ADI_STATERNK,
         y = .data$ADI_NATRANK,
@@ -303,7 +303,7 @@ It won't look like there's a problem, now, but prepping for this image helped me
 
 ```{r area_by_adi_in_county}
 
-COUNTY %>%
+COUNTY |>
     ggplot2::ggplot(ggplot2::aes(
         x = .data$ALAND,
         y = .data$ADI_NATRANK,
@@ -338,7 +338,7 @@ You can really see the benefit of re-using settings in this code block.
 
 ```{r map_adi_in_county}
 
-COUNTY %>%
+COUNTY |>
     ggplot2::ggplot(ggplot2::aes(
         fill = .data$ADI_NATRANK
     )) +

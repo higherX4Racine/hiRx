@@ -54,9 +54,9 @@ The simple features that describe Higher Expectations' partner municipalities ar
 
 ```{r load_places}
 PLACE_FILES <- c(
-    `2000` = "tl_2010_55101_cousub00.shp",
-    `2010` = "tl_2010_55101_cousub10.shp",
-    `2020` = "tl_2020_55_cousub.shp"
+    `2000` = "tl_2010_55101_cousub00",
+    `2010` = "tl_2010_55101_cousub10",
+    `2020` = "tl_2020_55_cousub"
 )
 
 .MUNICIPALITIES <- tibble::tribble(
@@ -105,22 +105,25 @@ PLACE_FILES <- c(
     "Yorkville",      "West of the I"
 )
 
-PLACES <- PLACE_FILES %>%
-    hiRx::census_tigershapes_combine(
+PLACES <- PLACE_FILES |>
+    hercgeos::batch_read_tigershapes(
+        .names_to = "File"
+    ) |>
+    dplyr::filter(
         SHAPEFILE_PATH,
         .data$COUNTYFP == 101L,
         .data$INTPTLON < -87.7
     )
 
-MUNIS <- PLACES %>%
+MUNIS <- PLACES |>
     dplyr::left_join(
         .MUNICIPALITIES,
         by = "NAMELSAD"
-    ) %>%
+    ) |>
     dplyr::group_by(
         .data$Year,
         .data$Municipality
-    ) %>%
+    ) |>
     dplyr::summarize(
         dplyr::across(
             tidyselect::all_of(c("ALAND", "AWATER")),
@@ -133,8 +136,8 @@ MUNIS <- PLACES %>%
         Area = (.data$ALAND + .data$AWATER) / 1e6,
         geometry = sf::st_union(.data$geometry),
         .groups = "keep"
-    ) %>%
-    dplyr::ungroup() %>%
+    ) |>
+    dplyr::ungroup() |>
     dplyr::left_join(
         .REGIONS,
         by = "Municipality"
@@ -147,12 +150,12 @@ The decennial censuses report data down to the census block. The population with
 
 ```{r load_blocks}
 BLOCK_FILES <- c(
-    `2000` = "tl_2010_55101_tabblock00.shp",
-    `2010` = "tl_2010_55101_tabblock10.shp",
-    `2020` = "tl_2020_55_tabblock20.shp"
+    `2000` = "tl_2010_55101_tabblock00",
+    `2010` = "tl_2010_55101_tabblock10",
+    `2020` = "tl_2020_55_tabblock20"
 )
 
-BLOCKS <- BLOCK_FILES %>%
+BLOCKS <- BLOCK_FILES |>
     hiRx::census_tigershapes_combine(
         SHAPEFILE_PATH,
         .data$COUNTYFP == 101L
@@ -163,31 +166,31 @@ BLOCKS <- BLOCK_FILES %>%
 
 ```{r assign_blocks_to_munis}
 
-MUNI_BLOCKS <- MUNIS %>%
-        sf::st_transform(UTM_ZONE) %>%
+MUNI_BLOCKS <- MUNIS |>
+        sf::st_transform(UTM_ZONE) |>
         tidyr::nest(
             locale = !tidyselect::all_of(c(
                 "Region",
                 "Municipality",
                 "Year"
                 ))
-        ) %>%
+        ) |>
         dplyr::mutate(
             blocks = purrr::map2(
                 .data$locale,
                 .data$Year,
                 ~ dplyr::filter(BLOCKS,
-                                .data$Year == .y) %>%
-                    sf::st_transform(UTM_ZONE) %>%
-                    hiRx::geom_filter_by_interior_intersection(.x) %>%
+                                .data$Year == .y) |>
+                    sf::st_transform(UTM_ZONE) |>
+                    hiRx::geom_filter_by_interior_intersection(.x) |>
                     dplyr::select(tidyselect::all_of(c("TRACTCE",
-                                                       "BLOCKCE"))) %>%
+                                                       "BLOCKCE"))) |>
                     sf::st_drop_geometry()
             )
-        ) %>%
+        ) |>
         dplyr::select(
             !.data$locale
-        ) %>%
+        ) |>
         tidyr::unnest(
             cols = .data$blocks
         )
@@ -199,16 +202,16 @@ MUNI_BLOCKS <- MUNIS %>%
 Using a union command from the simple features library, we can assemble the individual block geometries into the tracts that contain them. This is also an opportunity to compute summary features, such as the population within each census tract and the area of each tract in square kilometers.
 
 ```{r aggregate_tracts}
-TRACTS <- BLOCKS %>%
+TRACTS <- BLOCKS |>
     dplyr::group_by(
         .data$Year,
         .data$TRACTCE
-    ) %>%
+    ) |>
     dplyr::summarize(
         Area = sum(.data$ALAND + .data$AWATER) / 1e6,
         geometry = sf::st_union(.data$geometry),
         .groups = "keep"
-    ) %>%
+    ) |>
     dplyr::ungroup()
 ```
 
@@ -241,14 +244,14 @@ Table formats and contents vary across decennial censuses, which impacts the API
     2020L, "P2_006N", "Black",
 )
 
-.DECENNIAL_POPULATION_SETTINGS <- .DECENNIAL_POPULATION_VARIABLES %>%
+.DECENNIAL_POPULATION_SETTINGS <- .DECENNIAL_POPULATION_VARIABLES |>
     dplyr::select(
         .data$year,
         .data$Variable
-        ) %>%
+        ) |>
     tidyr::nest(
         data = .data$Variable
-        ) %>%
+        ) |>
     dplyr::mutate(
         variables = purrr::map_chr(data,
                                    ~ paste0(.$Variable, collapse = ",")),
@@ -259,29 +262,29 @@ Table formats and contents vary across decennial censuses, which impacts the API
 The census API returns JSON data in a 2D, list-of-lists format. The following chunk makes a total of 3 api calls and retrieves thousands of observations (one for each block in Racine County).
 
 ```{r acquire_populations}
-RAW_POPS <- .DECENNIAL_POPULATION_SETTINGS %>%
+RAW_POPS <- .DECENNIAL_POPULATION_SETTINGS |>
     purrr::pmap_chr(hiRx::decennial_query_url,
                     summary_table = "pl",
                     for_geo = "block",
                     for_items = "*",
                     state = 55,
                     county = 101
-    ) %>%
-    magrittr::set_names(., .DECENNIAL_POPULATION_SETTINGS$year) %>%
+    ) |>
+    magrittr::set_names(., .DECENNIAL_POPULATION_SETTINGS$year) |>
     purrr::map(hiRx::census_do_api_query)
 ```
 
 There are some formatting problems in the data from the 2000 census. For example, the tract field is usually 6 digits long, so some responses need extra zeros on the right side. This formatting problem makes it really difficult to query on a per-tract basis. The total population variable also has a different name in some decennial census. Each of those names got its own column after the `bind rows` step above. One column has numbers for each census, and the rest are `NA`s. Here, those columns are stacked into a single one, and the `NA` variables are expunged.
 
 ```{r wrangle_populations}
-POPS <- RAW_POPS %>%
+POPS <- RAW_POPS |>
     purrr::map(
         hiRx::census_json_to_tibble,
         variable_names = .DECENNIAL_POPULATION_VARIABLES$Variable
-    ) %>%
+    ) |>
     dplyr::bind_rows(
         .id = "Year"
-    ) %>%
+    ) |>
     dplyr::mutate(
         Year = as.integer(.data$Year),
         tract = stringr::str_pad(
@@ -290,11 +293,11 @@ POPS <- RAW_POPS %>%
             side = "right",
             pad = "0"
         )
-    ) %>%
+    ) |>
     dplyr::left_join(
         .DECENNIAL_POPULATION_VARIABLES,
         by = c(Year = "year", "Variable")
-    ) %>%
+    ) |>
     dplyr::select(
         !.data$Variable
     )
@@ -310,19 +313,19 @@ Think of it as the "racist cab-driver" classification system.
 
 ```{r wrangle_races}
 
-RACES <- POPS %>%
+RACES <- POPS |>
     tidyr::pivot_wider(
         names_from = .data$Race,
         values_from = .data$Population
-    ) %>%
+    ) |>
     dplyr::mutate(
         `All Other Races` = .data$`All Other Races` - .data$Black - .data$White
-    ) %>%
+    ) |>
     tidyr::pivot_longer(
         cols = tidyselect::any_of(hiRx::RACE_LABELS_RACINE),
         names_to = "Race/Ethnicity",
         values_to = "Population"
-    ) %>%
+    ) |>
     dplyr::mutate(
         `Race/Ethnicity` = factor(.data$`Race/Ethnicity`,
                                   levels = hiRx::RACE_LABELS_RACINE)
@@ -335,18 +338,18 @@ There is no need to perform any spatial analysis to find the population totals w
 Grouping and summarizing by geographic factors is sufficient.
 
 ```{r tract_races}
-TRACT_RACES <- RACES %>%
+TRACT_RACES <- RACES |>
     dplyr::group_by(
         .data$Year,
         .data$state,
         .data$county,
         .data$tract,
         .data$`Race/Ethnicity`
-    ) %>%
+    ) |>
     dplyr::summarize(
         `Tract Population` = sum(.data$Population),
         .groups = "keep"
-    ) %>%
+    ) |>
     dplyr::ungroup()
 ```
 
@@ -357,23 +360,23 @@ Many tracts occur entirely within one county subdivision, but others overlap sub
 Keeping track of the population within each intersection makes it possible to compute weighted statistics for each municipality for data that are collected at the tract level.
 
 ```{r muni_tract_races}
-MUNI_TRACT_RACES <- RACES %>%
+MUNI_TRACT_RACES <- RACES |>
     dplyr::inner_join(
         MUNI_BLOCKS,
         by = c("Year", tract = "TRACTCE", block = "BLOCKCE")
-    ) %>%
+    ) |>
     dplyr::group_by(
         .data$Year,
         .data$Region,
         .data$Municipality,
         .data$tract,
         .data$`Race/Ethnicity`,
-    ) %>%
+    ) |>
     dplyr::summarize(
         `Municipal Population` = sum(.data$Population),
         .groups = "keep"
-    ) %>%
-    dplyr::ungroup() %>%
+    ) |>
+    dplyr::ungroup() |>
     dplyr::inner_join(
         TRACT_RACES,
         by = c("Year", "tract", "Race/Ethnicity")
@@ -385,25 +388,25 @@ MUNI_TRACT_RACES <- RACES %>%
 ```{r muni_pops}
 .block_fields <- c("Year", "tract", "block")
 
-MUNI_POPULATIONS <- MUNI_BLOCKS %>%
+MUNI_POPULATIONS <- MUNI_BLOCKS |>
     dplyr::rename(
         tract = "TRACTCE",
         block = "BLOCKCE"
-    ) %>%
+    ) |>
     dplyr::left_join(RACES,
                      by = .block_fields
-    ) %>%
+    ) |>
     dplyr::group_by(
         .data$Year,
         .data$Region,
         .data$Municipality,
         .data$`Race/Ethnicity`
-    ) %>%
+    ) |>
     dplyr::summarize(
         Population = sum(.data$Population),
         .groups = "keep"
-    ) %>%
-    dplyr::ungroup() %>%
+    ) |>
+    dplyr::ungroup() |>
     dplyr::mutate(
         Municipality = forcats::fct_reorder(.data$Municipality,
                                             .data$Population)
@@ -411,24 +414,24 @@ MUNI_POPULATIONS <- MUNI_BLOCKS %>%
 ```
 
 ```{r table_of_muni_pops_per_year}
-MUNI_POPULATIONS %>%
+MUNI_POPULATIONS |>
     dplyr::group_by(
         .data$Region,
         .data$Municipality,
         .data$Year,
-    ) %>%
+    ) |>
     dplyr::summarize(
         Population = sum(.data$Population),
         .groups = "keep"
-    ) %>%
+    ) |>
     tidyr::pivot_wider(
         names_from = .data$Year,
         values_from = .data$Population
-    ) %>%
+    ) |>
     dplyr::arrange(
         .data$Region,
         dplyr::desc(.data$`2020`)
-    ) %>%
+    ) |>
     knitr::kable(
         format.args = list(big.mark = ",")
     )
@@ -436,21 +439,21 @@ MUNI_POPULATIONS %>%
 
 ```{r area_plots_of_region_race_populations}
 
-MUNI_POPULATIONS %>%
+MUNI_POPULATIONS |>
     dplyr::filter(
         !is.na(.data$Region)
-    ) %>%
+    ) |>
     dplyr::group_by(
         .data$Year,
         .data$Region,
         .data$`Race/Ethnicity`
-    ) %>%
+    ) |>
     dplyr::summarize(
         Population = sum(.data$Population,
                          na.rm = TRUE),
         .groups = "keep"
-    ) %>%
-    dplyr::ungroup() %>%
+    ) |>
+    dplyr::ungroup() |>
     ggplot2::ggplot(ggplot2::aes(
         x = .data$Year,
         y = .data$Population,
@@ -478,11 +481,11 @@ MUNI_POPULATIONS %>%
 ```
 
 ```{r bar_plots_for_munis}
-PLOTS_FOR_MUNIS <- MUNI_POPULATIONS %>%
-    tidyr::nest(data = !.data$Municipality) %>%
+PLOTS_FOR_MUNIS <- MUNI_POPULATIONS |>
+    tidyr::nest(data = !.data$Municipality) |>
     dplyr::pull(.data$data,
-                name = .data$Municipality) %>%
-    purrr::imap(~ .x %>%
+                name = .data$Municipality) |>
+    purrr::imap(~ .x |>
                     ggplot2::ggplot(
                         ggplot2::aes(x = .data$Year,
                                      y = .data$Population,
@@ -503,7 +506,7 @@ PLOTS_FOR_MUNIS <- MUNI_POPULATIONS %>%
                     ggplot2::theme(legend.position = "bottom")
     )
 
-BAR_PLOTS_FOR_MUNIS <- PLOTS_FOR_MUNIS %>%
+BAR_PLOTS_FOR_MUNIS <- PLOTS_FOR_MUNIS |>
     purrr::map( ~ . + 
             ggplot2::geom_col(position = "dodge",
                               col = hiRx::higher_ex_cols("gray"))
@@ -513,7 +516,7 @@ purrr::walk(BAR_PLOTS_FOR_MUNIS, print)
 ```
 
 ```{r area_plots_for_munis}
-AREA_PLOTS_FOR_MUNIS <- PLOTS_FOR_MUNIS %>%
+AREA_PLOTS_FOR_MUNIS <- PLOTS_FOR_MUNIS |>
     purrr::map( ~ . + 
             ggplot2::geom_area(col = hiRx::higher_ex_cols("gray"))
     )
@@ -525,27 +528,27 @@ purrr::walk(AREA_PLOTS_FOR_MUNIS, print)
 #### Tract Populations by Race and Municipality
 
 ```{r population_by_place_and_tract}
-MUNI_TRACT_POPS <- MUNI_BLOCKS %>%
+MUNI_TRACT_POPS <- MUNI_BLOCKS |>
     dplyr::select(
         .data$Municipality,
         .data$Year,
         tract = .data$TRACTCE,
         block = .data$BLOCKCE
-        ) %>%
+        ) |>
     dplyr::right_join(
         RACES,
         by = c("Year", "tract",  "block")
-        ) %>%
+        ) |>
     dplyr::group_by(
         .data$Year,
         .data$Municipality,
         .data$tract,
         .data$`Race/Ethnicity`
-        ) %>%
+        ) |>
     dplyr::summarize(
         Population = sum(.data$Population),
         .groups = "keep"
-        ) %>%
+        ) |>
     dplyr::ungroup()
 ```
 
@@ -555,20 +558,20 @@ Comparing Racine's boundaries to those of the tracts finds the tracts that make 
 
 ```{r find_tracts_in_racine}
 
-RACINE_CITY <- MUNIS %>%
+RACINE_CITY <- MUNIS |>
     dplyr::filter(
         stringr::str_detect(.data$Municipality, "Racine")
-    ) %>%
+    ) |>
     dplyr::select(
         where(~ dplyr::n_distinct(.) > 1)
-    ) %>%
+    ) |>
     sf::st_transform(UTM_ZONE)
 
-RACINE_TRACTS <- TRACTS %>%
-        sf::st_transform(UTM_ZONE) %>%
+RACINE_TRACTS <- TRACTS |>
+        sf::st_transform(UTM_ZONE) |>
     tidyr::nest(
         small = !.data$Year
-    ) %>%
+    ) |>
     dplyr::mutate(
         racine = purrr::map2(
             .data$small,
@@ -579,13 +582,13 @@ RACINE_TRACTS <- TRACTS %>%
                               .data$Year == .y)
             )
         )
-    ) %>%
+    ) |>
     dplyr::select(
         !.data$small
-    ) %>%
+    ) |>
     tidyr::unnest(
         cols = .data$racine
-    ) %>%
+    ) |>
     sf::st_as_sf()
 
 ggplot2::ggplot(RACINE_TRACTS,
@@ -613,24 +616,24 @@ ggplot2::ggplot(RACINE_TRACTS,
 #### Population Density of Racine's Census Tracts
 
 ```{r plot_racine_tracts_by_pop_density}
-RACINE_TRACTS %>%
+RACINE_TRACTS |>
     dplyr::left_join(
-        MUNI_TRACT_POPS %>%
+        MUNI_TRACT_POPS |>
             dplyr::filter(
                 stringr::str_detect(.data$Municipality,
                                     "Racine")
-            ) %>%
+            ) |>
             dplyr::group_by(
                 .data$Year,
                 .data$tract
-            ) %>%
+            ) |>
             dplyr::summarize(
                 Population = sum(.data$Population),
                 .groups = "keep"
-            ) %>%
+            ) |>
             dplyr::ungroup(),
         by = c("Year", TRACTCE = "tract")
-    ) %>%
+    ) |>
     ggplot2::ggplot() +
     ggplot2::geom_sf(
         ggplot2::aes(fill = .data$Population / .data$Area)
@@ -668,11 +671,11 @@ RACINE_TRACTS %>%
 #### Population Density of Racine's Census Tracts, by Race
 
 ```{r plot_racine_tracts_by_race_pop_density, fig.dim=c(10, 10)}
-RACINE_TRACTS %>%
+RACINE_TRACTS |>
     dplyr::left_join(
         MUNI_TRACT_POPS,
         by = c("Year", TRACTCE = "tract")
-    ) %>%
+    ) |>
     ggplot2::ggplot() +
     ggplot2::geom_sf(
         ggplot2::aes(fill = .data$Population)

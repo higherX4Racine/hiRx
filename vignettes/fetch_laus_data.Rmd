@@ -7,14 +7,11 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
-rlang::exec(knitr::opts_chunk$set,
-            !!!hiRx::CHUNK_OPTIONS_FOR_KNITR)
-```
-
 ```{r setup}
+rlang::exec(knitr::opts_chunk$set,
+            !!!hiRx::CHUNK_OPTIONS_FOR_KNITR,
+            eval = FALSE)
 library(hiRx)
-library(magrittr)
 set.seed(42)
 
 human_friendly_name <- function(.string) {
@@ -25,6 +22,10 @@ human_friendly_name <- function(.string) {
         return(.);
 }
 ```
+
+## DISCONTINUED
+
+The approach that this takes is now in violation of the BLS's website use rules.
 
 ## LAUS Data
 

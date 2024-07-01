@@ -19,11 +19,9 @@ library(rlang)
 library(magrittr)
 library(hiRx)
 
-DATA_PATH <- file.path(path.expand("~"),
-                       "Higher Expectations/Data")
+DATA_PATH <- Sys.getenv("DATA_PATH")
 
-SHAPEFILE_PATH <- file.path(DATA_PATH,
-                            "Downloads/Census Shapefiles")
+SHAPEFILE_PATH <- Sys.getenv("SHAPEFILE_PATH")
 ```
 
 ## American Community Survey 5-Year Tables
@@ -39,7 +37,7 @@ SHAPEFILE_PATH <- file.path(DATA_PATH,
     "B19013I_001E", "Latin@"
 )
 
-.ACS5_INCOME_YEARS <- seq(2010, 2020, by = 5) %>% purrr::set_names()
+.ACS5_INCOME_YEARS <- seq(2010, 2020, by = 5) |> purrr::set_names()
 
 CPI <- readr::read_csv(
     file.path(DATA_PATH,
@@ -49,29 +47,36 @@ CPI <- readr::read_csv(
                             Annual = readr::col_double())
     )
 
-.ACS5_INCOME_SETTINGS <- tibble::tibble(Year = .ACS5_INCOME_YEARS) %>%
-    dplyr::left_join(CPI, by = "Year") %>%
-    dplyr::arrange(.data$Year) %>%
+.ACS5_INCOME_SETTINGS <- tibble::tibble(Year = .ACS5_INCOME_YEARS) |>
+    dplyr::left_join(CPI, by = "Year") |>
+    dplyr::arrange(.data$Year) |>
     dplyr::mutate(Ratio = dplyr::last(.data$Annual) / .data$Annual)
 
 ```
 
 ```{r load_blocks}
 BLOCK_FILES <- c(
-    `2000` = "tl_2010_55101_tabblock00.shp",
-    `2010` = "tl_2010_55101_tabblock10.shp",
-    `2020` = "tl_2020_55_tabblock20.shp"
+    `2000` = "tl_2010_55101_tabblock00",
+    `2010` = "tl_2010_55101_tabblock10",
+    `2020` = "tl_2020_55_tabblock20"
 )
 
-BLOCKS <- hiRx::census_tigershapes_combine(BLOCK_FILES,
-                                           SHAPEFILE_PATH,
-                                           .data$COUNTYFP == "101") %>%
-    dplyr::filter(.data$INTPTLON < -87.7,
-                  .data$INTPTLON > -87.96)
+BLOCKS <- BLOCK_FILES |>
+    purrr::imap(
+        ~ file.path(SHAPEFILE_PATH, .y, .x)
+    ) |>
+    hercgeos::batch_read_tigershapes(
+        .names_to = "Vintage"
+    ) |>
+    dplyr::filter(
+        .data$INTPTLON < -87.7,
+        .data$INTPTLON > -87.96,
+        .data$COUNTYFP == "101"
+    )
 ```
 
 ```{r acquire_incomes}
-RAW_INCOMES <- .ACS5_INCOME_YEARS %>%
+RAW_INCOMES <- .ACS5_INCOME_YEARS |>
     purrr::map(
         function(n, ...) acs5_query_url(year = n, ...),
         variables = paste0(.ACS5_INCOME_VARIABLES$Variable,
@@ -81,41 +86,41 @@ RAW_INCOMES <- .ACS5_INCOME_YEARS %>%
                            collapse = ","),
         state = 55,
         county = 101
-    ) %>%
+    ) |>
     purrr::map(
         hiRx::census_do_api_query
     )
 ```
 
 ```{r wrangle_incomes}
-INCOME_BY_TRACT <- RAW_INCOMES %>%
+INCOME_BY_TRACT <- RAW_INCOMES |>
     purrr::map(
         hiRx::census_json_to_tibble,
         variable_names = .ACS5_INCOME_VARIABLES$Variable,
         .val_trans_f = ~ readr::parse_integer(., na = c("", "NA", "NULL", "-666666666")),
         .value_column = "Income"
-    ) %>%
+    ) |>
     dplyr::bind_rows(
         .id = "Year"
-    ) %>%
+    ) |>
     dplyr::mutate(
         Year = as.integer(.data$Year),
         Vintage = 10 * floor(0.1 * .data$Year)
-    ) %>%
+    ) |>
     dplyr::left_join(
         .ACS5_INCOME_VARIABLES,
         by = "Variable"
-    ) %>%
+    ) |>
     dplyr::select(
         !.data$Variable
-    ) %>%
+    ) |>
     dplyr::left_join(
         .ACS5_INCOME_SETTINGS,
         by = "Year"
-    ) %>%
+    ) |>
     dplyr::mutate(
         `Income in 2020 Dollars` = .data$Income * .data$Ratio
-    ) %>%
+    ) |>
     dplyr::select(
         !c(.data$Annual, .data$Ratio)
     )
@@ -124,19 +129,19 @@ INCOME_BY_TRACT <- RAW_INCOMES %>%
 ### Median Incomes by Race and Location
 
 ```{r wrangle_income_locations}
-INCOME_BY_MUNI <- INCOME_BY_TRACT %>%
+INCOME_BY_MUNI <- INCOME_BY_TRACT |>
     dplyr::inner_join(
         dplyr::bind_rows(
             hiRx::racine_race_pop_weights_by_tract,
-            hiRx::racine_race_pop_weights_by_tract %>%
+            hiRx::racine_race_pop_weights_by_tract |>
                 dplyr::group_by(
                     .data$Year, .data$Municipality, .data$tract
-                ) %>%
+                ) |>
                 dplyr::summarize(
                     dplyr::across(tidyselect::ends_with("Population"), sum),
                     .groups = "keep"
-                ) %>%
-                dplyr::ungroup() %>%
+                ) |>
+                dplyr::ungroup() |>
                 dplyr::mutate(`Race/Ethnicity` = "All")
         ),
         by = c(
@@ -144,13 +149,13 @@ INCOME_BY_MUNI <- INCOME_BY_TRACT %>%
             "tract",
             "Race/Ethnicity"
         )
-    ) %>%
+    ) |>
     dplyr::group_by(
         .data$Year,
         .data$Municipality,
         .data$tract,
         .data$`Race/Ethnicity`
-    ) %>%
+    ) |>
     dplyr::summarize(
         People = sum(.data$`Municipal Population`),
         dplyr::across(
@@ -159,12 +164,12 @@ INCOME_BY_MUNI <- INCOME_BY_TRACT %>%
             w = .data$`Municipal Population` / .data$`Tract Population`
         ),
         .groups = "keep"
-    ) %>%
+    ) |>
     dplyr::group_by(
         .data$Year,
         .data$Municipality,
         .data$`Race/Ethnicity`
-    ) %>%
+    ) |>
     dplyr::summarize(
         Population = sum(.data$People),
         dplyr::across(
@@ -173,22 +178,22 @@ INCOME_BY_MUNI <- INCOME_BY_TRACT %>%
             w = .data$People
         ),
         .groups = "keep"
-    ) %>%
+    ) |>
     dplyr::ungroup()
 ```
 
 ```{r income_by_race_and_place}
 
 clean_up_income <- function(.x, ...) {
-    .x %>%
+    .x |>
         dplyr::filter(
             !is.na(.data$Municipality)
-        ) %>%
+        ) |>
         dplyr::group_by(
             .data$Municipality,
             .data$Year,
             ...
-        ) %>%
+        ) |>
         dplyr::summarize(
             `Median Income` = spatstat.geom::weighted.median(
                 .data$Income,
@@ -200,8 +205,8 @@ clean_up_income <- function(.x, ...) {
             ),
             `Sample Size` = sum(.data$`Municipal Population`),
             .groups = "keep"
-        ) %>%
-        dplyr::ungroup() %>%
+        ) |>
+        dplyr::ungroup() |>
         dplyr::mutate(
             Municipality = forcats::fct_reorder(.data$Municipality,
                                                 .data$`Adjusted Median Income`,
@@ -209,35 +214,35 @@ clean_up_income <- function(.x, ...) {
         )
 }
 
-PLACE_INCOMES <- INCOME_BY_TRACT %>%
+PLACE_INCOMES <- INCOME_BY_TRACT |>
     dplyr::filter(
         .data$`Race/Ethnicity` == "Everybody"
-    ) %>%
+    ) |>
     dplyr::inner_join(
-        hiRx::racine_race_pop_weights_by_tract %>%
+        hiRx::racine_race_pop_weights_by_tract |>
             dplyr::group_by(.data$Year,
                             .data$Municipality,
-                            .data$tract) %>%
+                            .data$tract) |>
             dplyr::summarize(`Municipal Population` = sum(.data$`Municipal Population`),
                              .groups = "keep"),
         by = c(Vintage = "Year", "tract")
-    ) %>%
+    ) |>
     clean_up_income()
 
-PLACE_AND_RACE_INCOMES <- INCOME_BY_TRACT %>%
+PLACE_AND_RACE_INCOMES <- INCOME_BY_TRACT |>
     dplyr::inner_join(
         dplyr::filter(hiRx::racine_race_pop_weights_by_tract,
                       .data$`Municipal Population` > 0),
         by = c(Vintage = "Year", "tract", "Race/Ethnicity")
-    ) %>%
+    ) |>
     dplyr::filter(
         !is.na(.data$Municipality)
-    ) %>%
+    ) |>
     clean_up_income(.data$`Race/Ethnicity`)
 ```
 
 ```{r plot_income_trends}
-PLACE_AND_RACE_INCOMES %>%
+PLACE_AND_RACE_INCOMES |>
     ggplot2::ggplot(
         ggplot2::aes(x = .data$Year,
                      y = .data$`Adjusted Median Income`,
@@ -259,7 +264,7 @@ PLACE_AND_RACE_INCOMES %>%
 ```
 
 ```{r compare_incomes_across_munis}
-PLACE_INCOMES %>%
+PLACE_INCOMES |>
     ggplot2::ggplot(
         ggplot2::aes(x = .data$Year,
                      y = .data$`Adjusted Median Income`,

@@ -2,7 +2,7 @@
 title: "Using the US Dept. of Ed. College Scorecard API"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{college-scorecard}
+  %\VignetteIndexEntry{Using the US Dept. of Ed. College Scorecard API}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

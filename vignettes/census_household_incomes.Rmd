@@ -30,25 +30,27 @@ tigershapes_combine <- function(file_names,
                                 shapefile_path,
                                 ...) {
     .filter_commands = rlang::enquos(...)
-    file_names %>%
+    file_names |>
     purrr::imap(
         ~ file.path(shapefile_path,
                     .y,
-                    .x) %>%
-            sf::st_read() %>%
+                    .x) |>
+            sf::st_read() |>
             dplyr::rename_with(
-                stringr::str_remove,
-                pattern = paste0(stringr::str_extract(.y,
-                                                      "\\d{2}$"),
-                                 "$")
-            ) %>%
+                ~ stringr::str_remove(.,
+                                      pattern = paste0(
+                                          stringr::str_extract(.y,
+                                                               "\\d{2}$"),
+                                          "$"
+                                      ))
+            ) |>
             dplyr::filter(
                 !!!.filter_commands
             )    
-    ) %>%
+    ) |>
     dplyr::bind_rows(
         .id = "Year"
-    ) %>%
+    ) |>
     dplyr::mutate(
         Year = as.integer(.data$Year),
         dplyr::across(
@@ -69,30 +71,28 @@ tibble_from_json <- function(.l, .names_from = c("data", "labels")) {
     else if (.option == "labels") {
         .names <- names(.l[[1]])
     }
-    .l %>%
-        purrr::transpose(.) %>%
-        tibble::as_tibble(.name_repair = ~ .names) %>%
+    .l |>
+        purrr::transpose(.) |>
+        tibble::as_tibble(.name_repair = ~ .names) |>
         dplyr::mutate(dplyr::across(.fns = as.character))
 }
 
 ```
 
 ```{r load_geographies}
-DATA_PATH <- file.path(path.expand("~"),
-                       "Higher Expectations/Data/Downloads")
+DATA_PATH <- Sys.getenv("DATA_PATH")
 
-SHAPEFILE_PATH <- file.path(DATA_PATH,
-                            "Census Shapefiles")
+SHAPEFILE_PATH <- Sys.getenv("SHAPEFILE_PATH")
 
 PLACE_FILES <- c(
-    `2000` = "tl_2010_55101_cousub00.shp",
-    `2010` = "tl_2010_55101_cousub10.shp",
-    `2020` = "tl_2020_55_cousub.shp"
+    `2000` = "tl_2010_55101_cousub00",
+    `2010` = "tl_2010_55101_cousub10",
+    `2020` = "tl_2020_55_cousub"
 )
 
 PLACES <- tigershapes_combine(PLACE_FILES,
                               SHAPEFILE_PATH,
-                              .data$COUNTYFP == "101") %>%
+                              .data$COUNTYFP == "101") |>
     dplyr::filter(
         .data$ALAND > 0,
         .data$INTPTLON < -87.7,
@@ -100,14 +100,14 @@ PLACES <- tigershapes_combine(PLACE_FILES,
     )
 
 BLOCK_GROUP_FILES <- c(
-    `2000` = "tl_2010_55101_bg00.shp",
-    `2010` = "tl_2010_55101_bg10.shp",
-    `2020` = "tl_2020_55_bg.shp"
+    `2000` = "tl_2010_55101_bg00",
+    `2010` = "tl_2010_55101_bg10",
+    `2020` = "tl_2020_55_bg"
 )
 
 BLOCK_GROUPS <- tigershapes_combine(BLOCK_GROUP_FILES,
                                     SHAPEFILE_PATH,
-                                    .data$COUNTYFP == "101") %>%
+                                    .data$COUNTYFP == "101") |>
     dplyr::filter(
         .data$ALAND > 0,
         .data$INTPTLON < -87.7,
@@ -115,14 +115,14 @@ BLOCK_GROUPS <- tigershapes_combine(BLOCK_GROUP_FILES,
     )
 
 BLOCK_FILES <- c(
-    `2000` = "tl_2010_55101_tabblock00.shp",
-    `2010` = "tl_2010_55101_tabblock10.shp",
-    `2020` = "tl_2020_55_tabblock20.shp"
+    `2000` = "tl_2010_55101_tabblock00",
+    `2010` = "tl_2010_55101_tabblock10",
+    `2020` = "tl_2020_55_tabblock20"
 )
 
 BLOCKS <- tigershapes_combine(BLOCK_FILES,
                               SHAPEFILE_PATH,
-                              .data$COUNTYFP == "101") %>%
+                              .data$COUNTYFP == "101") |>
     dplyr::filter(
         .data$ALAND > 0,
         .data$INTPTLON < -87.7,
@@ -139,27 +139,27 @@ PLACE_BLOCKS <- sf::st_relate(PLACES,
           BLOCKS$Year,
           "==")
 
-# county_tracts <- county_blocks %>%
+# county_tracts <- county_blocks |>
 #     dplyr::group_by(
 #         .data$TRACTCE
-#         ) %>%
+#         ) |>
 #     dplyr::summarize(
 #         POP = sum(.data$POP),
 #         Area = sum(.data$ALAND + .data$AWATER),
 #         geometry = sf::st_union(.data$geometry)
-#     ) %>%
-#     dplyr::ungroup() %>%
+#     ) |>
+#     dplyr::ungroup() |>
 #     dplyr::bind_cols(
 #         .,
-#         .$geometry %>%
-#             sf::st_centroid() %>%
+#         .$geometry |>
+#             sf::st_centroid() |>
 #             sf::st_coordinates()
 #     )
 # 
-# racine_tracts <- county_tracts %>%
+# racine_tracts <- county_tracts |>
 #     sf::st_filter(racine_city)
 # 
-# eastern_tracts <- county_tracts %>%
+# eastern_tracts <- county_tracts |>
 #     dplyr::filter(.data$X > -88,
 #                   .data$X < -87.7
 #     )
@@ -167,18 +167,18 @@ PLACE_BLOCKS <- sf::st_relate(PLACES,
 ```
 
 ```{r census_details}
-foo <- "acs5 2020 variables.json" %>%
-    file.path(DATA_PATH, .) %>%
-    jsonlite::read_json() %>%
+foo <- "acs5 2020 variables.json" |>
+    file.path(DATA_PATH, .) |>
+    jsonlite::read_json() |>
     purrr::pluck(1)
 
-census_details <- foo %>%
-    purrr::transpose(.) %>%
-    tibble::as_tibble() %>%
+census_details <- foo |>
+    purrr::transpose(.) |>
+    tibble::as_tibble() |>
     dplyr::mutate(
         dplyr::across(.fns = as.character),
         variable = names(foo)
-        ) %>%
+        ) |>
     dplyr::filter(
         stringr::str_detect(.data$group,
                             "B")
@@ -231,13 +231,13 @@ rm(foo)
 ```
 
 ```{r household_variables}
-household_variables <- census_details %>%
+household_variables <- census_details |>
     dplyr::filter(
         stringr::str_detect(.data$group,
                             "^B11001"),
         stringr::str_detect(.data$variable,
                             "_001")
-    ) %>%
+    ) |>
     tidyr::separate(
         col = .data$label,
         into = c(NA, NA, "Census Latin@ Status", "Census Race"),
@@ -245,7 +245,7 @@ household_variables <- census_details %>%
         fill = "right",
         extra = "drop",
         remove = FALSE
-    ) %>%
+    ) |>
     dplyr::mutate(
         dplyr::across(c(.data$`Census Latin@ Status`,
                         .data$`Census Race`),
@@ -253,7 +253,7 @@ household_variables <- census_details %>%
                       pattern = ":"),
         `Race Ethnicity` = .RACE_MAP[stringr::str_to_upper(.data$`Census Race`)],
         `Latin@ Status` = .HISP_MAP[.data$`Census Latin@ Status`]
-    ) %>%
+    ) |>
     dplyr::select(
         .data$variable,
         .data$`Census Latin@ Status`,
@@ -264,27 +264,27 @@ household_variables <- census_details %>%
 ```
 
 ```{r income_variables}
-income_variables <- census_details %>%
+income_variables <- census_details |>
     dplyr::filter(
         stringr::str_detect(.data$group,
                             "B19013"),
         stringr::str_detect(.data$concept,
                             "^MEDIAN")
-        ) %>%
+        ) |>
     dplyr::mutate(
-        `Census Race` = .data$concept %>%
+        `Census Race` = .data$concept |>
             stringr::str_remove(
                 string = .,
                 pattern = "MEDIAN HOUSEHOLD INCOME IN THE PAST 12 MONTHS \\(IN \\d{4} INFLATION-ADJUSTED DOLLARS\\)"
-            ) %>%
+            ) |>
             stringr::str_remove_all(
                 string = .,
                 pattern = "\\(|\\)|HOUSEHOLDER"
-            ) %>%
+            ) |>
             stringr::str_squish(.),
         `Latin@ Status` = .RACE_MAP[.data$`Census Race`],
         `Race Ethnicity` = .RACE_MAP[.data$`Census Race`]
-    ) %>%
+    ) |>
     dplyr::select(
         .data$variable,
         .data$`Census Race`,
@@ -300,44 +300,44 @@ health_by_tract <- acs5_query_url(2020,
                 "tract",
                 racine_tracts$TRACTCE,
                 state = 55,
-                county = 101) %>%
-    jsonlite::read_json() %>%
-    tibble_from_json() %>%
+                county = 101) |>
+    jsonlite::read_json() |>
+    tibble_from_json() |>
     tidyr::pivot_longer(
         cols = !c(.data$state, .data$county, .data$tract),
         names_to = "variable",
         values_to = "people",
         values_transform = list(people = as.integer)
-    ) %>%
-    dplyr::rename(TRACTCE = .data$tract) %>%
+    ) |>
+    dplyr::rename(TRACTCE = .data$tract) |>
     dplyr::left_join(health_variables, by = "variable")
 
-age_totals <- health_by_tract %>%
+age_totals <- health_by_tract |>
     dplyr::group_by(
         .data$Age,
                     .data$TRACTCE
-        ) %>%
+        ) |>
     dplyr::summarize(
         `Age Total` = sum(.data$people)
         )
 
-health_by_tract <- health_by_tract %>%
+health_by_tract <- health_by_tract |>
     dplyr::filter(
         .data$Covered == "Yes"
-        ) %>%
+        ) |>
     dplyr::select(
         .data$TRACTCE,
         .data$Age,
         .data$people
-        ) %>%
+        ) |>
     dplyr::left_join(
         age_totals,
                      by = c("Age", "TRACTCE")
-        ) %>%
+        ) |>
     dplyr::rename(
         `People Covered` = .data$people,
         `Total People` = .data$`Age Total`
-        ) %>%
+        ) |>
     dplyr::mutate(
         Age = factor(.data$Age,
                      levels = unique(.data$Age)),
@@ -346,8 +346,8 @@ health_by_tract <- health_by_tract %>%
 ```
 
 ```{r plot_health_and_age, fig.dim = c(8, 3.2), out.width = "90%", fig.align = "center"}
-racine_tracts %>%
-    dplyr::left_join(health_by_tract, by = "TRACTCE") %>%
+racine_tracts |>
+    dplyr::left_join(health_by_tract, by = "TRACTCE") |>
     ggplot2::ggplot() +
     ggplot2::geom_sf(ggplot2::aes(fill = .data$Coverage)) +
     ggplot2::geom_sf(data = racine_city,
