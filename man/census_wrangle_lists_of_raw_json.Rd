@@ -21,7 +21,7 @@ census_wrangle_lists_of_raw_json(
 
 \item{.indexname}{the name of the field that holds row indices}
 
-\item{...}{<[`dynamic-dots`][rlang::dyn-dots]> other inputs to \code{\link[hiRx]{census_tibble_to_json}}}
+\item{...}{<[`dynamic-dots`][rlang::dyn-dots]> other inputs to \code{\link[hiRx]{census_json_to_tibble}}}
 }
 \value{
 a tibble with factor variables and observed values
@@ -31,5 +31,5 @@ Convert lists of JSON-formatted census data to tidy tables.
 }
 \seealso{
 \code{\link[hiRx]{census_expand_factors}}
-\code{\link[hiRx]{census_tibble_to_json}}
+\code{\link[hiRx]{census_json_to_tibble}}
 }

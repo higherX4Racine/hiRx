@@ -12,6 +12,8 @@ laus_extra_jobs(.x, .focal_geo, .comp_geo, .result_name = "Additional Jobs")
 \item{.focal_geo}{the area whose number of jobs would be changed.}
 
 \item{.comp_geo}{the area whose employment rate is the baseline.}
+
+\item{.result_name}{optional, the name for the new column}
 }
 \value{
 a tibble with a new category of Measure, "Additional Jobs"

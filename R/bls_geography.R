@@ -11,16 +11,24 @@
 bls_geography <- function(area_type,
                           state_or_region,
                           area = NULL) {
-    .bls <- reticulate::import("herc.bls")
-    .area_types <- .bls$AREA_TYPES
-    if (!area_type %in% names(.area_types)) {
+    if (!area_type %in% hiRx::BLS_AREA_TYPES$prefix) {
         rlang::abort(glue::glue(
             "Error: '{area_type}' is not a valid Area Type."
         ))
     }
-    if (!is.null(area)) {
-        area <- as.integer(area)
+    if (is.null(area)) {
+        area <- 0L
     }
-    .bls$AREA_TYPES[[area_type]]$id_for(as.integer(state_or_region),
-                                        area)
+    area <- as.integer(area)
+
+    .index <- stringr::str_which(hiRx::BLS_AREA_TYPES$prefix,
+                                 area_type)
+
+    .digits <- hiRx::BLS_AREA_TYPES$digits[.index]
+
+    .suffix <- area |>
+        stringr::str_pad(.digits, "left", 0) |>
+        stringr::str_pad(11, "right", 0)
+
+    sprintf("%s%02d%s", area_type, as.integer(state_or_region), .suffix)
 }

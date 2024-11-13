@@ -26,9 +26,7 @@ INTEGER_COLUMNS <- SERIES_NAMES[c(4, 6)]
 
 #' Separate a LAUS series code into its components
 #'
-#' @param .x a data frame or character vector with series codes
-#' @param .col optional. If \code{.x} is a data frame, this is the name of the
-#'     column that holds the series codes. It defaults to "series".
+#' @param .codes character vector with series codes
 #'
 #' @return a data frame with the following fields
 #'     \describe{
@@ -39,11 +37,9 @@ INTEGER_COLUMNS <- SERIES_NAMES[c(4, 6)]
 #'         \item{measure_code}{an integer code for what the series measures.}
 #'     }
 #' @export
-#' @importFrom magrittr %>%
 #'
 #' @examples
-#' tibble::tribble(
-#'     ~ series,
+#' laus_parse_series(c(
 #'     "LAUST290000000000009",
 #'     "LAUCS233569500000005",
 #'     "LAUMT542658000000003",
@@ -54,35 +50,23 @@ INTEGER_COLUMNS <- SERIES_NAMES[c(4, 6)]
 #'     "LAUCT134319200000005",
 #'     "LAUMC554802000000004",
 #'     "LAURD840000000000006"
-#' )
-laus_parse_series <- function(.x, .col = "series_id") {
-    if (rlang::inherits_any(.x,
-                            c("tbl_df", "tbl", "data.frame"))) {
-        .result <- tidyr::separate(data = .x,
-                                   col = {{ .col }},
-                                   into = SERIES_NAMES,
-                                   sep = SERIES_BREAKS)
+#' ))
+laus_parse_series <- function(.codes) {
+    if (any(nchar(.codes) != 20L)) {
+        stop(".x must be vector of 20-character strings")
     }
-    else if (rlang::inherits_any(.x, "character")) {
-        # note the inversion of the normal pipe argument!
-        .result <- purrr::map2(
-                SERIES_BREAKS[-N_PARTS] + 1,
-                SERIES_BREAKS[-1],
-                stringr::str_sub,
-                string = .x
-            ) %>%
-            rlang::set_names(
-                SERIES_NAMES[-1]
-            ) %>%
-            tibble::as_tibble()
-    }
-    else {
-        stop(".x must be a data frame or a character vector")
-    }
-    .result %>%
+    .result <- purrr::map2(
+        SERIES_BREAKS[-N_PARTS] + 1,
+        SERIES_BREAKS[-1],
+        \(.x, .y) stringr::str_sub(.codes, start = .x, end = .y)
+    ) |>
+        rlang::set_names(
+            SERIES_NAMES[-1]
+        ) |>
+        tibble::as_tibble() |>
         dplyr::mutate(
-            dplyr::across(INTEGER_COLUMNS,
+            dplyr::across(tidyselect::all_of(INTEGER_COLUMNS),
                           as.integer)
-    ) %>%
+    ) |>
     invisible()
 }

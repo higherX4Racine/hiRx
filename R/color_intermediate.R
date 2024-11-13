@@ -1,5 +1,5 @@
 color_intermediate <- function(a, b) {
-    .c <- as(
+    .c <- methods::as(
         colorspace::hex2RGB(c(a,
                               b)),
         "polarLUV"

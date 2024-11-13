@@ -4,8 +4,8 @@
 
 
 .colonic <- function(...) {
-    list(...) %>%
-        purrr::imap(~ paste0("in=", .y, ":", .x)) %>%
+    list(...) |>
+        purrr::imap(~ paste0("in=", .y, ":", .x)) |>
         paste0(collapse = "&")
 }
 

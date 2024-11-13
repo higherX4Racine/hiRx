@@ -19,21 +19,21 @@ PERIOD_PATTERN <- "\\d+$"
 
 laus_fetch_observations <- function(index_table,
                                     pattern) {
-    index_table %>%
+    index_table |>
         dplyr::select(
             .data$Table
-        ) %>%
+        ) |>
         dplyr::filter(
             stringr::str_detect(.data$Table,
                                 pattern)
-        ) %>%
+        ) |>
         dplyr::mutate(
             Data = purrr::map(.data$Table,
                               laus_fetch_table,
                               OBSERVATION_COLUMNS),
             .keep = "unused"
-        ) %>%
-        tidyr::unnest("Data") %>%
+        ) |>
+        tidyr::unnest("Data") |>
         invisible()
 }
 
@@ -46,20 +46,20 @@ laus_fetch_observations <- function(index_table,
 
 
 laus_current <- function(.laus_tables) {
-    .laus_tables %>%
-        laus_fetch_observations(PATTERN_FOR_CURRENT_OBSERVATIONS) %>%
+    .laus_tables |>
+        laus_fetch_observations(PATTERN_FOR_CURRENT_OBSERVATIONS) |>
         invisible()
 }
 
 
 laus_legacy <- function(.laus_tables) {
-    .laus_tables %>%
+    .laus_tables |>
         laus_fetch_observations(
             PATTERN_FOR_LEGACY_OBSERVATIONS
-        ) %>%
+        ) |>
         dplyr::filter(
             .data$year < FIRST_YEAR_OF_CURRENT_OBSERVATIONS
-        ) %>%
+        ) |>
         invisible()
 }
 
@@ -78,14 +78,13 @@ laus_legacy <- function(.laus_tables) {
 #'    }
 #'    The \code{series} field tracks where the data are from and what they are.
 #' @export
-#' @importFrom magrittr %>%
 laus_all <- function(.laus_tables) {
     dplyr::bind_rows(laus_current(.laus_tables),
-                     laus_legacy(.laus_tables)) %>%
+                     laus_legacy(.laus_tables)) |>
         dplyr::filter(
             stringr::str_detect(.data$period,
                                 PERIOD_TO_EXCLUDE)
-        ) %>%
+        ) |>
         dplyr::mutate(
             date = lubridate::make_date(
                 year = .data$year,
@@ -94,6 +93,6 @@ laus_all <- function(.laus_tables) {
             ),
             .keep = "unused",
             .after = .data$series_id
-        ) %>%
+        ) |>
         invisible()
 }

@@ -13,11 +13,11 @@ census_json_to_tibble <- function(jsonlist,
                                   variable_names,
                                   .val_trans_f = readr::parse_integer,
                                   .value_column = "Population") {
-    jsonlist %>%
-        tail(-1) %>%
-        purrr::transpose(.) %>%
-        tibble::as_tibble(.name_repair = ~ as.character(jsonlist[[1]])) %>%
-        dplyr::mutate(dplyr::across(.fns = as.character)) %>%
+    jsonlist |>
+        utils::tail(-1) |>
+        purrr::transpose() |>
+        tibble::as_tibble(.name_repair = ~ as.character(jsonlist[[1]])) |>
+        dplyr::mutate(dplyr::across(.fns = as.character)) |>
         tidyr::pivot_longer(
             cols = tidyselect::any_of(variable_names),
             names_to = "Variable",

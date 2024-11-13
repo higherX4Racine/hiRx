@@ -7,13 +7,13 @@
 identify_indices(.x, .col, .focal_value, .peak_col = "Value")
 }
 \arguments{
-\item{.x}{the data frame to summarize}
+\item{.x}{<obj> the data frame to summarize}
 
-\item{.col}{the column to find indices in.}
+\item{.col}{<str> the name of the column to find indices in.}
 
-\item{.focal_value}{a value to focus on (e.g. the year 2020)}
+\item{.focal_value}{<num> a value to focus on (e.g. the year 2020)}
 
-\item{.peak_col}{a column to search for its max. defaults to "Value"}
+\item{.peak_col}{<str> the name of  the column to search for its max. defaults to "Value"}
 }
 \value{
 a tibble with ``Name``, ``Index``, ``X Offset``, and ``Y Offset``
@@ -22,9 +22,10 @@ a tibble with ``Name``, ``Index``, ``X Offset``, and ``Y Offset``
 Identify the indices of rows that will be labelled in a graph
 }
 \examples{
-racine_laus \%>\%
-    purrr::pluck("wisconsin") \%>\%
-    hiRx::unlump_series(Series) \%>\%
-    dplyr::filter(`Measure Code` == "06", Month == "January") \%>\%
-    identify_indices(Year, 2020)
+racine_laus |>
+    purrr::pluck("wisconsin") |>
+    dplyr::mutate(Parsed = laus_parse_series(.data$Series)) |>
+    tidyr::unnest("Parsed") |>
+    dplyr::filter(.data$measure_code == 6L, Month == "January") |>
+    identify_indices("Year", 2020)
 }

@@ -16,7 +16,7 @@ plot_percent_by_race <- function(.x,
                                  label,
                                  .race_ethnicity = "Race/Ethnicity",
                                  .text_size = 4){
-    .x %>%
+    .x |>
         ggplot2::ggplot(
             ggplot2::aes(x = {{ response }},
                          y = .data[[.race_ethnicity]],

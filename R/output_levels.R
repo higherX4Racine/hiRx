@@ -1,18 +1,17 @@
 #' Print out quoted, comma-trailed terms, one per line
 #'
-#' @param ... arguments to be quoted and printed
+#' @param x the first argument
+#' @param ... additional arguments to be quoted and printed
 #'
 #' @return nothing, it just prints things
 #' @export
 #'
-#' @importFrom magrittr %>%
 output_levels <- function(x, ...){
     .tmp <- c(x, rlang::list2(...))
-        glue::glue(
-            '"{.tmp}"'
-        ) %>%
+    '"{.tmp}"' |>
+        glue::glue() |>
         paste0(
             collapse = ",\n"
-        ) %>%
+        ) |>
         cat()
 }

@@ -14,11 +14,11 @@ census_safe_api_query <- function(.x, max_per_query = 40, ...){
         rep(LETTERS,
             each = max_per_query,
             length.out = nrow(.x))
-    ) %>%
+    ) |>
         purrr::map(
             hiRx::census_api_url,
             ...
-        ) %>%
+        ) |>
         purrr::map(
             hiRx::census_do_api_query
         )

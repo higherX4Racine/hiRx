@@ -9,17 +9,38 @@ Description: This is probably going to be a meta-package, eventually.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 Suggests: 
     rmarkdown,
     testthat (>= 3.0.0),
     knitr,
     tibble
 Config/testthat/edition: 3
-Imports: 
+Imports:
+    cellranger,
+    cli,
+    colorspace,
+    dplyr,
     ggplot2,
     grDevices,
-    magrittr
+    glue,
+    httr2,
+    jsonlite,
+    lubridate,
+    purrr,
+    readxl,
+    rvest,
+    scales,
+    sf,
+    stringr,
+    tidyr,
+    tidyselect,
+    vctrs,
+    xml2,
+    readr,
+    rlang,
+    utils,
+    methods
 VignetteBuilder: knitr
 Depends: 
     R (>= 2.10)

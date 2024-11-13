@@ -5,3 +5,5 @@
 inst/doc
 vignettes/*_cache/*
 docs
+/doc/
+/Meta/
