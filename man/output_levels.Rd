@@ -7,7 +7,9 @@
 output_levels(x, ...)
 }
 \arguments{
-\item{...}{arguments to be quoted and printed}
+\item{x}{the first argument}
+
+\item{...}{additional arguments to be quoted and printed}
 }
 \value{
 nothing, it just prints things

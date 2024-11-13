@@ -5,9 +5,9 @@ geom_interior_intersection_area <- function(atomic_geoms,
     sf::st_intersection(atomic_geoms,
                         sf::st_geometry(containing_geom),
                         .predicate = sf::st_relate,
-                        pattern = "T********") %>%
-        sf::st_make_valid() %>%
-        sf::st_area() %>%
+                        pattern = "T********") |>
+        sf::st_make_valid() |>
+        sf::st_area() |>
         as.numeric()
 }
 
@@ -21,11 +21,11 @@ geom_interior_intersection_area <- function(atomic_geoms,
 geom_filter_by_interior_intersection <- function(atomic_geoms,
                                                  containing_geom) {
 
-    atomic_geoms %>%
+    atomic_geoms |>
         sf::st_filter(containing_geom,
                       .predicate = sf::st_relate,
-                      pattern = "T********") %>%
+                      pattern = "T********") |>
         dplyr::filter(
-            geom_interior_intersection_area(., containing_geom) > 1
+            geom_interior_intersection_area(.data$geometry, containing_geom) > 1
         )
 }

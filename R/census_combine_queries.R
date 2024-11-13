@@ -13,16 +13,16 @@ census_combine_queries <- function(.l,
                                    .field_name = "Variable",
                                    .value_name = "Population",
                                    .index_name = "Index") {
-    .l %>%
+    .l |>
         purrr::map(
             hiRx::census_json_to_tibble,
             variable_names = metadata[[.field_name]]
-        ) %>%
-        dplyr::bind_rows() %>%
+        ) |>
+        dplyr::bind_rows() |>
         dplyr::inner_join(
             metadata,
             by = .field_name
-        ) %>%
+        ) |>
         dplyr::select(
             !c({{.field_name}},
                {{.index_name}})

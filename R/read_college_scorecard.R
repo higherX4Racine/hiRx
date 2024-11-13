@@ -18,13 +18,12 @@ read_college_scorecard <- function(.path,
                            "MERGED(\\d{4})_")[1, 2]
     )
 
-    .path %>%
+    .path |>
         readr::read_csv(
-            file = .,
             na = c("", "NA", "NULL"),
             col_types = .spec,
             show_col_types = FALSE
-        ) %>%
+        ) |>
         dplyr::mutate(
             `School Year` = .school_year,
             Students = dplyr::coalesce(.data$UGDS,
@@ -34,26 +33,26 @@ read_college_scorecard <- function(.path,
             `Class Size` = dplyr::coalesce(.data$D150_4,
                                            .data$D150_L4),
             Graduates = .data$`Class Size` * .data$`Graduation Rate`
-        ) %>%
+        ) |>
         dplyr::rename(
             `New Students` = .data$SCUGFFN
-        ) %>%
+        ) |>
         dplyr::group_by(
             .data$OPEID6,
             .data$`School Year`
-        ) %>%
+        ) |>
         dplyr::summarize(
             dplyr::across(c(.data$Graduates,
                             .data$`Class Size`,
                             .data$Students,
                             .data$`New Students`),
-                          ~ sum(., na.rm = TRUE)
+                          \(.) sum(., na.rm = TRUE)
             ),
             .groups = "keep"
-        ) %>%
-        dplyr::ungroup() %>%
+        ) |>
+        dplyr::ungroup() |>
         dplyr::mutate(
             `Graduation Rate` = .data$Graduates / .data$`Class Size`
-        ) %>%
+        ) |>
         invisible()
 }

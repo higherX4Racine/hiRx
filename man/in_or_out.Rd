@@ -10,6 +10,8 @@ in_or_out(blocks, containing_geo, group_id)
 \item{blocks}{the many census blocks}
 
 \item{containing_geo}{the single covering geo}
+
+\item{group_id}{the column that defines group membership}
 }
 \value{
 a wider table

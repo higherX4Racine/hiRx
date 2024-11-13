@@ -20,7 +20,7 @@ a new data frame with a column, ``prefix`` inserted before ``.col``
 Strip out the first several characters from a column
 }
 \examples{
-get_prefix(
+hiRx:::get_prefix(
     tibble::tribble(~Text, "hello", "world"),
     Text,
     3

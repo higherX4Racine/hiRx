@@ -21,7 +21,7 @@ assign_race_labels(
 
 \item{target_name}{optional, defaults to "Race/Ethnicity".}
 
-\item{levels}{optional, the new levels for the Race/Ethnicity factor.}
+\item{.levels}{optional, the new levels for the Race/Ethnicity factor.}
 }
 \value{
 a new data frame with a factor, `Race/Ethnicity`, of Racine races.

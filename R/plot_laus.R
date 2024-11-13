@@ -1,7 +1,7 @@
 # Copyright (C) 2022 by Higher Expectations for Racine County
 
 .measure_subset <- function(.x, .measures) {
-    .search_string <- paste0(measures, "$", collapse = "|")
+    .search_string <- paste0(.measures, "$", collapse = "|")
     invisible(
         dplyr::filter(.x,
                       stringr::str_detect(.x$Measure,
@@ -45,12 +45,12 @@
 
     .u <- .measure_subset(.x, .trends)
 
-    .v <- .u %>%
-        annotation_table(.year) %>%
+    .v <- .u |>
+        annotation_table(.year) |>
         .update_rate(
             .rate_factor,
             .rate_key
-        ) %>%
+        ) |>
         .nudge_labels(.nudge_x, .nudge_y)
 
     invisible(
@@ -69,7 +69,7 @@
         ggplot2::labs(y = "Number of People",
                       color = NULL) +
         ggplot2::geom_text(
-            mapping = ggplot2::aes(label = Label,
+            mapping = ggplot2::aes(label = .data$Label,
                                    hjust = "center"),
             data = .v,
             show.legend = FALSE
@@ -83,7 +83,7 @@
 
 
 .one_axis <- function(.x, .name, .scale) {
-    .x %>%
+    .x |>
         ggplot2::ggplot(
             ggplot2::aes(x = .x$Year,
                          y = .x$Value)
@@ -100,7 +100,7 @@
                       .trend_colors,
                       .rate_name,
                       .rate_factor) {
-    .x %>%
+    .x |>
         ggplot2::ggplot(
             ggplot2::aes(x = .x$Year,
                          y = .x$Value,

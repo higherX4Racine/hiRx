@@ -12,12 +12,12 @@ census_expand_factors <- function(..., .offset_field = "offset"){
                        .name_repair = ~ vctrs::vec_as_names(.,
                                                             repair = "unique",
                                                             quiet = TRUE)
-    ) %>%
-        dplyr::rowwise() %>%
+    ) |>
+        dplyr::rowwise() |>
         dplyr::mutate(
             Index = sum(dplyr::c_across(tidyselect::contains(.offset_field))),
             .keep = "unused"
-        ) %>%
+        ) |>
         dplyr::arrange(
             .data$Index
         )

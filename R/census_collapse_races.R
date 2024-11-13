@@ -11,7 +11,7 @@ census_collapse_races <- function(.x,
                                 .census_label_field = "Census Race",
                                 .value_field = "Population",
                                 .summary_f = sum){
-    .x %>%
+    .x |>
         dplyr::group_by(
             dplyr::across(
                 !tidyselect::any_of(c(
@@ -19,9 +19,9 @@ census_collapse_races <- function(.x,
                     .value_field)
                 )
             )
-        ) %>%
+        ) |>
         dplyr::summarize(
             "{.value_field}" := .summary_f(.data[[.value_field]])
-        ) %>%
+        ) |>
         dplyr::ungroup()
 }

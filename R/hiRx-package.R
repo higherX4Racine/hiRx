@@ -20,3 +20,10 @@
 #' new sources
 #'
 "_PACKAGE"
+
+## usethis namespace: start
+#' @importFrom rlang :=
+## usethis namespace: end
+NULL
+
+utils::globalVariables(".data")

@@ -12,25 +12,25 @@ census_tigershapes_combine <- function(file_names,
                                        shapefile_path,
                                        ...) {
     .filter_commands <- rlang::enquos(...)
-    file_names %>%
+    file_names |>
         purrr::imap(
             ~ file.path(shapefile_path,
                         .y,
-                        .x) %>%
-                sf::st_read(quiet = TRUE) %>%
+                        .x) |>
+                sf::st_read(quiet = TRUE) |>
                 dplyr::rename_with(
                     stringr::str_remove,
                     pattern = paste0(stringr::str_extract(.y,
                                                           "\\d{2}$"),
                                      "$")
-                ) %>%
+                ) |>
                 dplyr::filter(
                     !!! .filter_commands
                 )
-        ) %>%
+        ) |>
         dplyr::bind_rows(
             .id = "Year"
-        ) %>%
+        ) |>
         dplyr::mutate(
             Year = as.integer(.data$Year),
             dplyr::across(

@@ -13,22 +13,22 @@ RACINE_MEASURES <- c(
 )
 
 racine_laus <- function(.x) {
-    .x %>%
+    .x |>
         dplyr::filter(
             .data$State == "55"
-        ) %>%
+        ) |>
         dplyr::filter(
             stringr::str_detect(.data$Area,
                                 stringr::str_c(names(RACINE_LOCAL_AREAS),
                                                collapse = "|"))
-        ) %>%
+        ) |>
         dplyr::mutate(
             Measure = RACINE_MEASURES[.data$Measure],
             Area = RACINE_LOCAL_AREAS[.data$Area]
-        ) %>%
+        ) |>
         dplyr::filter(
             !is.na(.data$Measure),
             !is.na(.data$Area)
-        ) %>%
+        ) |>
         invisible()
 }
