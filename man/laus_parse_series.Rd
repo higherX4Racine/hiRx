@@ -4,13 +4,10 @@
 \alias{laus_parse_series}
 \title{Separate a LAUS series code into its components}
 \usage{
-laus_parse_series(.x, .col = "series_id")
+laus_parse_series(.codes)
 }
 \arguments{
-\item{.x}{a data frame or character vector with series codes}
-
-\item{.col}{optional. If \code{.x} is a data frame, this is the name of the
-column that holds the series codes. It defaults to "series".}
+\item{.codes}{character vector with series codes}
 }
 \value{
 a data frame with the following fields
@@ -26,8 +23,7 @@ a data frame with the following fields
 Separate a LAUS series code into its components
 }
 \examples{
-tibble::tribble(
-    ~ series,
+laus_parse_series(c(
     "LAUST290000000000009",
     "LAUCS233569500000005",
     "LAUMT542658000000003",
@@ -38,5 +34,5 @@ tibble::tribble(
     "LAUCT134319200000005",
     "LAUMC554802000000004",
     "LAURD840000000000006"
-)
+))
 }

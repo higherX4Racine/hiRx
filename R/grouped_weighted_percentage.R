@@ -43,12 +43,12 @@ grouped_weighted_percentage <- function(.x,
                                         all_value_field,
                                         in_weight_field,
                                         all_weight_field){
-    .x %>%
+    .x |>
         dplyr::group_by(
             dplyr::across(
                 .cols = tidyselect::all_of(groups)
             )
-        ) %>%
+        ) |>
         dplyr::summarize(
             dplyr::across(
                 .cols = tidyselect::all_of(
@@ -59,8 +59,8 @@ grouped_weighted_percentage <- function(.x,
                           .data[[all_weight_field]])
             ),
             .groups = "keep"
-        ) %>%
-        dplyr::ungroup() %>%
+        ) |>
+        dplyr::ungroup() |>
         dplyr::mutate(
             "Percent {in_value_field}" :=
                 .data[[in_value_field]] /

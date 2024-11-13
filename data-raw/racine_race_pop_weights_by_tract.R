@@ -9,11 +9,11 @@ PLACE_FILES <- c(
 
 PLACES <- hiRx::census_tigershapes_combine(PLACE_FILES,
                                            Sys.getenv("SHAPEFILE_PATH"),
-                                           .data$COUNTYFP == "101") %>%
+                                           .data$COUNTYFP == "101") |>
     dplyr::filter(
         .data$INTPTLON < -87.7,
         .data$INTPTLON > -87.96
-    ) %>%
+    ) |>
     dplyr::rename(
         Municipality = "NAME"
     )
@@ -26,7 +26,7 @@ BLOCK_FILES <- c(
 
 BLOCKS <- hiRx::census_tigershapes_combine(BLOCK_FILES,
                                            Sys.getenv("SHAPEFILE_PATH"),
-                                           .data$COUNTYFP == "101") %>%
+                                           .data$COUNTYFP == "101") |>
     dplyr::filter(
         .data$INTPTLON < -87.7,
         .data$INTPTLON > -87.96
@@ -34,41 +34,41 @@ BLOCKS <- hiRx::census_tigershapes_combine(BLOCK_FILES,
 
 UTM_ZONE <- sf::st_crs(32616)
 
-PLACE_BLOCKS <- PLACES %>%
-        sf::st_transform(UTM_ZONE) %>%
+PLACE_BLOCKS <- PLACES |>
+        sf::st_transform(UTM_ZONE) |>
         tidyr::nest(
             locale = !c(.data$Municipality, .data$Year)
-        ) %>%
+        ) |>
         dplyr::mutate(
             blocks = purrr::map2(
                 .data$locale,
                 .data$Year,
                 ~ dplyr::filter(BLOCKS,
-                                .data$Year == .y) %>%
-                    sf::st_transform(UTM_ZONE) %>%
-                    hiRx::geom_filter_by_interior_intersection(.x) %>%
+                                .data$Year == .y) |>
+                    sf::st_transform(UTM_ZONE) |>
+                    hiRx::geom_filter_by_interior_intersection(.x) |>
                     dplyr::select(tidyselect::all_of(c("TRACTCE",
-                                                       "BLOCKCE"))) %>%
+                                                       "BLOCKCE"))) |>
                     sf::st_drop_geometry()
             )
-        ) %>%
+        ) |>
         dplyr::select(
             !.data$locale
-        ) %>%
+        ) |>
         tidyr::unnest(
             cols = .data$blocks
         )
 
-TRACTS <- BLOCKS %>%
+TRACTS <- BLOCKS |>
     dplyr::group_by(
         .data$Year,
         .data$TRACTCE
-    ) %>%
+    ) |>
     dplyr::summarize(
         Area = sum(.data$ALAND + .data$AWATER) / 1e6,
         geometry = sf::st_union(.data$geometry),
         .groups = "keep"
-    ) %>%
+    ) |>
     dplyr::ungroup()
 
 .DECENNIAL_POPULATION_VARIABLES <- tibble::tribble(
@@ -96,39 +96,39 @@ TRACTS <- BLOCKS %>%
     2020L, "P2_006N", "Black", FALSE,
 )
 
-.DECENNIAL_POPULATION_SETTINGS <- .DECENNIAL_POPULATION_VARIABLES %>%
+.DECENNIAL_POPULATION_SETTINGS <- .DECENNIAL_POPULATION_VARIABLES |>
     dplyr::select(
         .data$year,
         .data$Variable
-        ) %>%
+        ) |>
     tidyr::nest(
         data = .data$Variable
-        ) %>%
+        ) |>
     dplyr::mutate(
         variables = purrr::map_chr(data,
                                    ~ paste0(.$Variable, collapse = ",")),
         .keep = "unused")
 
 
-RAW_POPS <- .DECENNIAL_POPULATION_SETTINGS %>%
+RAW_POPS <- .DECENNIAL_POPULATION_SETTINGS |>
     purrr::pmap_chr(hiRx::decennial_query_url,
                     summary_table = "pl",
                     for_geo = "block",
                     for_items = "*",
                     state = 55,
                     county = 101
-    ) %>%
-    magrittr::set_names(., .DECENNIAL_POPULATION_SETTINGS$year) %>%
+    ) |>
+    rlang::set_names(., .DECENNIAL_POPULATION_SETTINGS$year) |>
     purrr::map(hiRx::census_do_api_query)
 
-POPS <- RAW_POPS %>%
+POPS <- RAW_POPS |>
     purrr::map(
         census_json_to_tibble,
         variable_names = .DECENNIAL_POPULATION_VARIABLES$Variable
-    ) %>%
+    ) |>
     dplyr::bind_rows(
         .id = "Year"
-    ) %>%
+    ) |>
     dplyr::mutate(
         Year = as.integer(.data$Year),
         tract = stringr::str_pad(
@@ -137,18 +137,18 @@ POPS <- RAW_POPS %>%
             side = "right",
             pad = "0"
         )
-    ) %>%
+    ) |>
     dplyr::left_join(
         .DECENNIAL_POPULATION_VARIABLES,
         by = c(Year = "year", "Variable")
-    ) %>%
+    ) |>
     dplyr::select(
         !.data$Variable
-    ) %>%
+    ) |>
     tidyr::pivot_wider(
         names_from = .data$Latinx,
         values_from = .data$Population
-    ) %>%
+    ) |>
     dplyr::mutate(
         Latinx = .data$`NA` - .data$`FALSE`,
         `Not Latinx` = .data$`FALSE`,
@@ -169,50 +169,50 @@ POPS <- RAW_POPS %>%
     "White", FALSE, "White"
 )
 
-RACES <- POPS %>%
+RACES <- POPS |>
     dplyr::filter(
         .data$Race != "Everybody"
-    ) %>%
+    ) |>
     dplyr::group_by(
         dplyr::across(tidyselect::all_of(.group_names))
-    ) %>%
+    ) |>
     dplyr::summarize(
         dplyr::across(tidyselect::contains("Latinx"),
                       sum),
-        .groups = 'keep') %>%
+        .groups = 'keep') |>
     dplyr::left_join(
-        POPS %>%
+        POPS |>
             dplyr::filter(
                 .data$Race == "Everybody"
             ),
         by = .group_names
-    ) %>%
+    ) |>
     dplyr::mutate(
         Race = "All Other Races",
         Latinx = .data$Latinx.y - .data$Latinx.x,
         `Not Latinx` = .data$`Not Latinx.y` - .data$`Not Latinx.x`,
         .keep = "unused"
-    ) %>%
+    ) |>
     dplyr::bind_rows(
-        POPS %>% dplyr::filter(.data$Race != "Everybody")
-    ) %>%
+        POPS |> dplyr::filter(.data$Race != "Everybody")
+    ) |>
     tidyr::pivot_longer(
         cols = c("Latinx", "Not Latinx"),
         names_to = "Latinx",
         names_transform = ~ stringr::str_detect(., "Not", negate = TRUE)
-    ) %>%
+    ) |>
     dplyr::inner_join(
         .CASTE_NAMES,
         by = c("Race", "Latinx")
-    ) %>%
+    ) |>
     dplyr::group_by(
         dplyr::across(tidyselect::all_of(c(.group_names, "Race/Ethnicity")))
-    ) %>%
+    ) |>
     dplyr::summarize(
         Population = sum(.data$value),
         .groups = "keep"
-    ) %>%
-    dplyr::ungroup() %>%
+    ) |>
+    dplyr::ungroup() |>
     dplyr::mutate(
         `Race/Ethnicity` = forcats::fct_relevel(.data$`Race/Ethnicity`,
                                                 "Black",
@@ -221,44 +221,44 @@ RACES <- POPS %>%
                                                 "All Other Races")
     )
 
-TRACT_RACES <- RACES %>%
+TRACT_RACES <- RACES |>
     dplyr::group_by(
         .data$Year,
         .data$state,
         .data$county,
         .data$tract,
         .data$`Race/Ethnicity`
-    ) %>%
+    ) |>
     dplyr::summarize(
         `Tract Population` = sum(.data$Population),
         .groups = "keep"
-    ) %>%
+    ) |>
     dplyr::ungroup()
 
-racine_race_pop_weights_by_tract <- RACES %>%
+racine_race_pop_weights_by_tract <- RACES |>
     dplyr::inner_join(
         PLACE_BLOCKS,
         by = c("Year", tract = "TRACTCE", block = "BLOCKCE")
-    ) %>%
+    ) |>
     dplyr::group_by(
         .data$Year,
         .data$Municipality,
         .data$tract,
         .data$`Race/Ethnicity`,
-    ) %>%
+    ) |>
     dplyr::summarize(
         `Municipal Population` = sum(.data$Population),
         .groups = "keep"
-    ) %>%
-    dplyr::ungroup() %>%
+    ) |>
+    dplyr::ungroup() |>
     dplyr::inner_join(
         TRACT_RACES,
         by = c("Year", "tract", "Race/Ethnicity")
-    ) %>%
+    ) |>
     dplyr::bind_rows(
         hiRx::aggregate_over_races(.,
                                    tidyselect::ends_with("Population"))
-    ) %>%
+    ) |>
     dplyr::mutate(
         `Race/Ethnicity` = factor(.data$`Race/Ethnicity`,
                                   levels = c("Black",

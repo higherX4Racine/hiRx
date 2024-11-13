@@ -14,6 +14,6 @@
 #' @export
 valid_intersections <- function(geos_of_interest, reference_geo){
     sf::st_intersection(sf::st_geometry(geos_of_interest),
-                        sf::st_geometry(reference_geo)) %>%
+                        sf::st_geometry(reference_geo)) |>
         sf::st_make_valid()
 }

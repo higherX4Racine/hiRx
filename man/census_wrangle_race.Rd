@@ -32,6 +32,3 @@ a tibble with better factor values
 \description{
 Condense and relabel racial and ethnic factors
 }
-\seealso{
-\code{\link[hiRx]{census_race_labels}}
-}

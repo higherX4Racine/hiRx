@@ -16,7 +16,7 @@ calculate_geo_diff(.x, .focal_geo, .comp_geo, .measure)
 \item{.measure}{the measure to compare between areas}
 }
 \value{
-a tibble with a new Measure, ``"{.measure} Difference"``
+a tibble with a new Measure, ``"\{.measure\} Difference"``
 }
 \description{
 Calculate differences across times between two areas for one measure

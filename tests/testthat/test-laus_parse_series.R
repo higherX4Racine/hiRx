@@ -13,7 +13,7 @@
 )
 
 .output <- tibble::tribble(
-    ~ seasonal, ~ area_prefix, ~ srd_code, ~ area_fips, ~ measure_code
+    ~ seasonal, ~ area_prefix, ~ srd_code, ~ area_fips, ~ measure_code,
     "U", "ST", 29, "00000000000", 9,
     "U", "CS", 23, "35695000000", 5,
     "U", "MT", 54, "26580000000", 3,
@@ -25,10 +25,6 @@
     "U", "MC", 55, "48020000000", 4,
     "U", "RD", 84, "00000000000", 6
 )
-
-test_that("parsing a data frame works", {
-    expect_equal(laus_parse_series(.input), .output)
-})
 
 test_that("parsing a character vector works", {
     expect_equal(laus_parse_series(.input$series), .output)

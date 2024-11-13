@@ -9,7 +9,7 @@ test_that("Racine County's Code is Correct", {
     expect_equal(bls_geography("CN",
                                55,
                                101),
-                 "CT5510100000000")
+                 "CN5510100000000")
 })
 
 test_that("Wisconsin's State Code is Correct", {

@@ -225,3 +225,28 @@
 #' @format A list of `readr::col_*` specifications.
 #' @source \url{https://collegescorecard.ed.gov/data/}
 "US_ED_COLLEGE_SCORECARD_SPEC"
+
+#' Information about how the US Dept. of Ed reports College Report Card Data
+#'
+#' @format a data frame with six columns:
+#' \describe{
+#' \item{dev-category}{<chr>}
+#' \item{developer-friendly name}{<chr>}
+#' \item{API data type}{<chr>}
+#' \item{VARIABLE NAME}{<chr>}
+#' \item{NAME OF DATA ELEMENT}{<chr>}
+#' \item{NOTES}{<chr>}
+#' }
+#' @source \url{https://collegescorecard.ed.gov/data/api-documentation/}
+"COLLEGE_REPORTCARD_API_FIELDS"
+
+#' Metadata about how the US BLS classifies geographic areas
+#'
+#' @format a data frame with three columns:
+#' \describe{
+#' \item{prefix}{<chr> the two-letter code for this kind of geograpic area}
+#' \item{digits}{<int> the number of digits this geography needs for its code.}
+#' \item{label}{<chr> a human-readable description of the type of area}
+#' }
+#' @source \url{https://www.bls.gov/cew/classifications/areas/area-guide.htm}
+"BLS_AREA_TYPES"

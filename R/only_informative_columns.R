@@ -5,5 +5,5 @@
 #' @return a tibble that may have fewer columns
 #' @export
 only_informative_columns <- function(.x) {
-    dplyr::select(.x, where(~dplyr::n_distinct(.) > 1))
+    dplyr::select(.x, tidyselect::where(~dplyr::n_distinct(.) > 1))
 }
