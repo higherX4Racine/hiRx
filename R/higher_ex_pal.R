@@ -77,8 +77,8 @@ higher_ex_pal <- function(palette = "main",
     race = higher_ex_cols(c(
         Black = "Tableau Azure",
         `Latin@` = "Tableau Olive",
-        White = "Tableau Green",
-        `All Other Races` = "Tableau Mauve",
+        Multiracial = "Tableau Mauve",
+        `White or Other Race` = "Tableau Green",
         All = "Gray"
     )),
     inverse = higher_ex_cols(
@@ -105,5 +105,27 @@ higher_ex_pal <- function(palette = "main",
         "Medium Blue",
         "Medium Green",
         "Gold"
+    ),
+    strivetogether = higher_ex_cols(
+        `All Students` = "Strive Slate",
+        `American Indian or Alaska Native` = "Strive Gray",
+        Asian = "Strive Orange",
+        `Black or African American` = "Strive Pink",
+        `English Language Learner` = "Strive Gold",
+        `Female` = "Strive Lilac",
+        `Hispanic or Latine` = "Strive Teal",
+        `Low Income` = "Strive Blue",
+        `Male` = "Strive Forest",
+        `Multi-Racial` = "Strive Sea",
+        `Native Hawaiian or Pacific Islander` = "Strive Red",
+        `Non-Binary` = "Strive Brown",
+        `White` = "Strive Robin"
+    ),
+    rusd_hs = higher_ex_cols(
+        Case = "Case Green",
+        Horlick = "Horlick Gray",
+        Park = "Park Orange",
+        REAL = "REAL Blue",
+        Walden = "Walden Purple"
     )
 )

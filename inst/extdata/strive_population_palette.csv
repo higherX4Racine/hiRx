@@ -1,0 +1,14 @@
+﻿Population,Hex color,Race/Ethnicity,Gender,Socioeconomic
+All Students,#3B5663,TRUE,TRUE,TRUE
+American Indian or Alaska Native,#B3B3B3,TRUE,FALSE,FALSE
+Asian,#F58B3B,TRUE,FALSE,FALSE
+Black or African American,#FABFD2,TRUE,FALSE,FALSE
+English Language Learner,#EFC94C,FALSE,FALSE,TRUE
+Female,#91679B,FALSE,TRUE,FALSE
+Hispanic or Latine,#1C95A9,TRUE,FALSE,FALSE
+Low Income,#118DFF,FALSE,FALSE,TRUE
+Male,#338676,FALSE,TRUE,FALSE
+Multi-Racial,#69C1B1,TRUE,FALSE,FALSE
+Native Hawaiian or Pacific Islander,#DD5757,TRUE,FALSE,FALSE
+Non-Binary,#B8682C,FALSE,TRUE,FALSE
+White,#AFE0E8,TRUE,FALSE,FALSE
