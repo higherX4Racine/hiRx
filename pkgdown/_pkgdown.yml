@@ -1,4 +1,4 @@
 url: https://higherx4racine.github.io/hiRx/
 template:
   bootstrap: 5
-  brand: _brand.yml
+  brand: pkgdown/_brand.yml
