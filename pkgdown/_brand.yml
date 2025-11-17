@@ -1,0 +1,31 @@
+meta:
+  name:
+    full: Higher Expectations for Racine County
+    short: Higher Expectations
+  links:
+    home: https://www.higherexpectationsracinecounty.org/
+    github:
+    instagram: http://instagram.com/higherexpectationsracine
+    facebook: https://www.facebook.com/higherexpectationsracinecounty/
+    linkedin: https://www.linkedin.com/company/higher-expectations
+
+color:
+  palette:
+    white: "#FFFFFF"
+    gold: "#FDB913"
+    gray: "#58585B"
+    blue_navy: "#0C223F"
+    blue_bright: "#00B2E2"
+    blue_medium: "#0081C9"
+
+  foreground: white
+  background: gray
+  primary: blue_bright
+  secondary: gold
+  tertiary: blue_medium
+  success: blue_navy
+  info: blue_medium
+  warning: blue_bright
+  danger: gold
+  dark: white
+  light: gray
