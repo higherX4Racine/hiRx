@@ -37,6 +37,9 @@ TBD
   : Information about how the US Dept. of Ed reports College Report Card
   Data
 
+- [`GENDER_MAPPING_IPEDS`](https://higherx4racine.github.io/hiRx/reference/GENDER_MAPPING_IPEDS.md)
+  : Codes that identify gender in IPEDS demographics tables
+
 - [`HERA_SCHOOLS`](https://higherx4racine.github.io/hiRx/reference/HERA_SCHOOLS.md)
   : Identifying information for finding HERA schools in the College
   Scorecard
@@ -63,6 +66,9 @@ TBD
 - [`RACE_MAPPING_DPI_STAFF`](https://higherx4racine.github.io/hiRx/reference/RACE_MAPPING_DPI_STAFF.md)
   : Codes that identify race/ethnicity in WI DPI staff demographics
   tables
+
+- [`RACE_MAPPING_IPEDS`](https://higherx4racine.github.io/hiRx/reference/RACE_MAPPING_IPEDS.md)
+  : Codes that identify race/ethnicity in IPEDS demographics tables
 
 - [`RACE_MAPPING_PALS`](https://higherx4racine.github.io/hiRx/reference/RACE_MAPPING_PALS.md)
   : Codes that identify race/ethnicity in PALS tables

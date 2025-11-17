@@ -23,7 +23,7 @@ An ordered list of race labels based on recent ancestry from ...
 
   Sub-Saharan Africa
 
-- Hispanic Latin@:
+- Hispanic or Latin@:
 
   former colonies of Spain, including most of Latin America
 
@@ -31,7 +31,7 @@ An ordered list of race labels based on recent ancestry from ...
 
   More than one of the other three categories.
 
-- White or Other Race:
+- White and Other Races:
 
   Europe, Asia, Oceania, and non-Hispanic indigenous peoples of the
   Western Hemisphere
