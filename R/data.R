@@ -77,9 +77,9 @@
 #' @format An ordered list of race labels based on recent ancestry from ...
 #'   \describe{
 #'     \item{Black}{Sub-Saharan Africa}
-#'     \item{Hispanic Latin@@}{former colonies of Spain, including most of Latin America}
+#'     \item{Hispanic or Latin@@}{former colonies of Spain, including most of Latin America}
 #'     \item{Multiracial}{More than one of the other three categories.}
-#'     \item{White or Other Race}{Europe, Asia, Oceania, and non-Hispanic indigenous peoples of the Western Hemisphere}
+#'     \item{White and Other Races}{Europe, Asia, Oceania, and non-Hispanic indigenous peoples of the Western Hemisphere}
 #'   }
 "RACE_LABELS_RACINE"
 

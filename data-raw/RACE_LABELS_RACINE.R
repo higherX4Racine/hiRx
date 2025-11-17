@@ -4,7 +4,7 @@ RACE_LABELS_RACINE <- c(
     "Black",
     "Hispanic or Latin@",
     "Multiracial",
-    "White or Other Race",
+    "White and Other Races",
     "All"
 )
 
