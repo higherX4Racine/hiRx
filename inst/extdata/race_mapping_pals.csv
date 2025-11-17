@@ -1,22 +1,22 @@
 SOURCE RACE,Long Description,Race/Ethnicity
-1,American Indian/Alaska Native,All Other Races
-2,Asian,All Other Races
+1,American Indian/Alaska Native,White and Other Races
+2,Asian,White and Other Races
 3,Black or African American,Black
-4,Unspecified,All Other Races
-5,White,White
-6,Native Hawaiian/Other Pacific Islander,All Other Races
-7,American Indian/Alaska Native and Asian,All Other Races
-8,American Indian/Alaska Native and Black or African American,Black
-9,American Indian/Alaska Native and White,All Other Races
-10,American Indian/Alaska Native and Native Hawaiian,All Other Races
-11,Asian and Black or African American,Black
-12,Asian and White,All Other Races
-13,Asian and Native Hawaiian,All Other Races
-14,Black or African American and White,Black
-15,Black or African American and Native Hawaiian,Black
-16,Native Hawaiian and White,All Other Races
-17,American Indian/Alaska Native Asian and Black or African American,Black
-18,American Indian/Alaska Native Asian and White,All Other Races
-19,American Indian/Alaska Native Asian and Native Hawaiian,All Other Races
-20,Asian Black or African American and White,Black
-21,Asian Black or African American and Native Hawaiian,Black
+4,Unspecified,White and Other Races
+5,White,White and Other Races
+6,Native Hawaiian/Other Pacific Islander,White and Other Races
+7,American Indian/Alaska Native and Asian,White and Other Races
+8,American Indian/Alaska Native and Black or African American,Multiracial
+9,American Indian/Alaska Native and White,White and Other Races
+10,American Indian/Alaska Native and Native Hawaiian,White and Other Races
+11,Asian and Black or African American,Multiracial
+12,Asian and White,White and Other Races
+13,Asian and Native Hawaiian,White and Other Races
+14,Black or African American and White,Multiracial
+15,Black or African American and Native Hawaiian,Multiracial
+16,Native Hawaiian and White,White and Other Races
+17,American Indian/Alaska Native Asian and Black or African American,Multiracial
+18,American Indian/Alaska Native Asian and White,White and Other Races
+19,American Indian/Alaska Native Asian and Native Hawaiian,White and Other Races
+20,Asian Black or African American and White,Multiracial
+21,Asian Black or African American and Native Hawaiian,Multiracial

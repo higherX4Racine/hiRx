@@ -13,7 +13,6 @@
 #'   }
 #' @source \url{https://yihui.org/knitr/options/}
 #' @export
-#' @rdname constants
 CHUNK_OPTIONS_FOR_KNITR <- list(
     collapse = TRUE,
     warning = FALSE,
@@ -25,3 +24,8 @@ CHUNK_OPTIONS_FOR_KNITR <- list(
                 height = 4),
     dev = c("png", "pdf")
 )
+
+#' The golden ratio
+#' @format An irrational number
+#' @export
+PHI <- (1 + sqrt(5)) / 2

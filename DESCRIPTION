@@ -40,8 +40,9 @@ Imports:
     readr,
     rlang,
     utils,
-    methods
+    methods,
+    emmeans
 VignetteBuilder: knitr
 Depends: 
-    R (>= 2.10)
+    R (>= 4.2.0)
 URL: https://higherx4racine.github.io/hiRx/
