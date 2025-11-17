@@ -7,10 +7,12 @@
 <url><loc>/authors.html</loc></url>
 <url><loc>/index.html</loc></url>
 <url><loc>/reference/BLS_AREA_TYPES.html</loc></url>
+<url><loc>/reference/CHUNK_OPTIONS_FOR_KNITR.html</loc></url>
 <url><loc>/reference/COLLEGE_REPORTCARD_API_FIELDS.html</loc></url>
 <url><loc>/reference/HERA_SCHOOLS.html</loc></url>
 <url><loc>/reference/HERA_SCHOOLS_RACINE.html</loc></url>
 <url><loc>/reference/LAUS_MEASURE_MAP.html</loc></url>
+<url><loc>/reference/PHI.html</loc></url>
 <url><loc>/reference/RACE_LABELS_RACINE.html</loc></url>
 <url><loc>/reference/RACE_MAPPING_CENSUS.html</loc></url>
 <url><loc>/reference/RACE_MAPPING_DPI_STAFF.html</loc></url>
@@ -42,9 +44,9 @@
 <url><loc>/reference/census_wrangle_lists_of_raw_json.html</loc></url>
 <url><loc>/reference/census_wrangle_race.html</loc></url>
 <url><loc>/reference/collapse_a_factor.html</loc></url>
-<url><loc>/reference/constants.html</loc></url>
 <url><loc>/reference/count_used_digits.html</loc></url>
 <url><loc>/reference/decennial_query_url.html</loc></url>
+<url><loc>/reference/emmean_main_effects.html</loc></url>
 <url><loc>/reference/fafsa_read_file.html</loc></url>
 <url><loc>/reference/find_synonyms.html</loc></url>
 <url><loc>/reference/geom_filter_by_interior_intersection.html</loc></url>
@@ -58,6 +60,8 @@
 <url><loc>/reference/in_or_out.html</loc></url>
 <url><loc>/reference/index.html</loc></url>
 <url><loc>/reference/input_path.html</loc></url>
+<url><loc>/reference/knit_percentage_table.html</loc></url>
+<url><loc>/reference/knit_two_ways.html</loc></url>
 <url><loc>/reference/laus_all.html</loc></url>
 <url><loc>/reference/laus_example.html</loc></url>
 <url><loc>/reference/laus_extra_jobs.html</loc></url>
@@ -76,6 +80,8 @@
 <url><loc>/reference/scale_aesthetics.html</loc></url>
 <url><loc>/reference/set_environment_variable.html</loc></url>
 <url><loc>/reference/summarize_block_groups.html</loc></url>
+<url><loc>/reference/to_camel_case.html</loc></url>
+<url><loc>/reference/two_way_percentages.html</loc></url>
 <url><loc>/reference/valid_intersections.html</loc></url>
 </urlset>
 
