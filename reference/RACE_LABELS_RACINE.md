@@ -1,14 +1,13 @@
-# Race, at least among Racine Students, usually means Black, Latin@, or White.
+# Race, at least among Racine Students, usually means Black, Latin@, Multiracial, or White.
 
-While folks in town are increasingly likely to identify as multiracial,
-there are still a small enough number of them that the only
-statistically useful thing to do is to lump everyone else into "All
-Other Races." This is obviously bad, but then again, so is all racial
-categorization? To add to the perfidy, I'm using the "one drop" system
-that is so perniciously part of American racism: you aren't Latin@ if
-you are Black, and you're not White if you are Black or Latin@. I am NOT
-endorsing this system. It reflects the nature of the community
-fragmentation that is in Racine today.
+The vast majority of students in Racine Unified identify with one of
+those four racial/ethnic identities. What about folks who identify with
+locally less frequent racial categories, such as Asian, Native American,
+or Pacific Islander? In the area of Racine Unified School District, the
+distribution of socioeconomic situations that those folks find
+themselves in is most similar to that of folks who identify as white. As
+of 2025, therefore, we will use the following 4 categories when
+reporting results with racial identities.
 
 ## Usage
 
@@ -24,14 +23,15 @@ An ordered list of race labels based on recent ancestry from ...
 
   Sub-Saharan Africa
 
-- Latin@:
+- Hispanic Latin@:
 
-  Latin America
+  former colonies of Spain, including most of Latin America
 
-- White:
+- Multiracial:
 
-  Europe or the Middle East
+  More than one of the other three categories.
 
-- All Other Races:
+- White or Other Race:
 
-  None of the above
+  Europe, Asia, Oceania, and non-Hispanic indigenous peoples of the
+  Western Hemisphere

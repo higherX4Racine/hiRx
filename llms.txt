@@ -54,7 +54,7 @@ TBD
 
 - [`RACE_LABELS_RACINE`](https://higherx4racine.github.io/hiRx/reference/RACE_LABELS_RACINE.md)
   : Race, at least among Racine Students, usually means Black, Latin@,
-  or White.
+  Multiracial, or White.
 
 - [`RACE_MAPPING_CENSUS`](https://higherx4racine.github.io/hiRx/reference/RACE_MAPPING_CENSUS.md)
   : Information for re-coding between Census and Higher Expectations
