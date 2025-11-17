@@ -63,6 +63,21 @@
 #' @source \url{https://api.census.gov}
 "racine_race_pop_weights_by_tract"
 
+
+#' Codes that identify gender in IPEDS demographics tables
+#'
+#' Recent files in the US Department of Education's Integrated Postsecondary
+#' Education Database may track a number of different gender identities. This
+#' table oversimplifies them into "Female" and "Non-female" to protect the
+#' identities of Racine people with uncommon gender identities.
+#' @format a tibble with 2 columns:
+#'   \describe{
+#'     \item{Gender}{The IPEDS label for this gender identity.}
+#'     \item{Sex}{A binary label for this set of identities in Racine, WI.}
+#'   }
+#' @source \url{https://nces.ed.gov/ipeds/datacenter/DataFiles.aspx}
+"GENDER_MAPPING_IPEDS"
+
 #' Race, at least among Racine Students, usually means Black, Latin@@,
 #' Multiracial, or White.
 #'
@@ -110,6 +125,19 @@
 #'   }
 #' @source \url{https://dpi.wi.gov/wise/data-elements/race}
 "RACE_MAPPING_DPI_STAFF"
+
+#' Codes that identify race/ethnicity in IPEDS demographics tables
+#'
+#' The US Department of Education's Integrated Postsecondary Education
+#' Database only loosely follows the OMB97 definitions of race and ethnicity.
+#' This table maps from its categories to Higher Expectations'.
+#' @format a tibble with 2 columns:
+#'   \describe{
+#'     \item{Race/Ethnicity}{The broad group for this subgroup in Racine, WI.}
+#'     \item{Population}{The IPEDS label for this racial group.}
+#'   }
+#' @source \url{https://nces.ed.gov/ipeds/datacenter/DataFiles.aspx}
+"RACE_MAPPING_IPEDS"
 
 #' Codes that identify race/ethnicity in PALS tables
 #'
