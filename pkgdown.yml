@@ -3,7 +3,7 @@ pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
   style-reference: style-reference.html
-last_built: 2025-11-17T19:27Z
+last_built: 2025-11-17T19:40Z
 urls:
   reference: https://higherx4racine.github.io/hiRx/reference
   article: https://higherx4racine.github.io/hiRx/articles

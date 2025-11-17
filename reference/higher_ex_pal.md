@@ -83,6 +83,6 @@ higher_ex_pal("blues")
 #>         rgb(x[, 1L], x[, 2L], x[, 3L], x[, 4L], maxColorValue = 255)
 #>     else rgb(x[, 1L], x[, 2L], x[, 3L], maxColorValue = 255)
 #> }
-#> <bytecode: 0x558e54ef67f0>
-#> <environment: 0x558e54ef1f30>
+#> <bytecode: 0x55a624e7cef0>
+#> <environment: 0x55a624e7a668>
 ```
