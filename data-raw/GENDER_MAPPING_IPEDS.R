@@ -6,9 +6,9 @@ GENDER_MAPPING_IPEDS <- tibble::tribble(
     "Female",              "Female",
     "Male",                "Non-female",
     "Another",             "Non-female",
-    "Binary",              "Non-female",
+    "Binary",              NA,
     "Unknown",             "Non-female",
-    "Unknown and Another", "Non-female"
+    "Unknown and Another", NA
 )
 
 usethis::use_data(GENDER_MAPPING_IPEDS, overwrite = TRUE)
