@@ -25,7 +25,7 @@
 #'               c("Aleph", "Bab", "Jeen", "Dal"))
 #' fuzzy_matches(c("Foo", "Bar", "Baz"),
 #'               c("Aleph", "Bab", "Jeen", "Dal"),
-#'               fixed = FALSE, partial = FALSE, ignore.case = TRUE)
+#'               fixed = FALSE, ignore.case = TRUE)
 fuzzy_matches <- function(.lhs, .rhs, ...) {
     .lhs |>
         utils::adist(
