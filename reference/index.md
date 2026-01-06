@@ -149,6 +149,10 @@
 - [`find_synonyms()`](https://higherx4racine.github.io/hiRx/reference/find_synonyms.md)
   : Look up the root item that corresponds to each item's synonym
 
+- [`fuzzy_matches()`](https://higherx4racine.github.io/hiRx/reference/fuzzy_matches.md)
+  : Find edit distances between pairwise combinations of two sets of
+  text
+
 - [`geom_filter_by_interior_intersection()`](https://higherx4racine.github.io/hiRx/reference/geom_filter_by_interior_intersection.md)
   : Find elements in \`atomic_geoms\` that overlap with
   \`containing_geom\`
