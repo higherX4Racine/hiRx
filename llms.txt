@@ -164,6 +164,10 @@ TBD
 - [`decennial_query_url()`](https://higherx4racine.github.io/hiRx/reference/decennial_query_url.md)
   : Create an API query URL for a table from a decennial US Census
 
+- [`detect_namespaces()`](https://higherx4racine.github.io/hiRx/reference/detect_namespaces.md)
+  : Search a folder for R scripts and list every namespace used in those
+  files
+
 - [`emmean_main_effects()`](https://higherx4racine.github.io/hiRx/reference/emmean_main_effects.md)
   : Create a table of estimates for specific levels of a main effect
 
