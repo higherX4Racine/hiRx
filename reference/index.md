@@ -264,3 +264,6 @@
 
 - [`valid_intersections()`](https://higherx4racine.github.io/hiRx/reference/valid_intersections.md)
   : Only report intersections with valid geometries
+
+- [`week_of_month()`](https://higherx4racine.github.io/hiRx/reference/week_of_month.md)
+  : Compute week numbers of dates for making calendars
