@@ -18,5 +18,5 @@ week_of_month(.days, .wdays = NULL)
 Compute week numbers of dates for making calendars
 }
 \examples{
-week_of_month(c("2026-01-01", "2026-02-01", "2026-03-01"))
+week_of_month(lubridate::ymd(c("2026-01-01", "2026-02-01", "2026-03-01")))
 }

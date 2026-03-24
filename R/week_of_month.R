@@ -7,7 +7,7 @@
 #' @export
 #'
 #' @examples
-#' week_of_month(c("2026-01-01", "2026-02-01", "2026-03-01"))
+#' week_of_month(lubridate::ymd(c("2026-01-01", "2026-02-01", "2026-03-01")))
 week_of_month <- function(.days, .wdays = NULL) {
     if (lubridate::is.Date(.days)) {
         if (is.null(.wdays)) {
