@@ -26,6 +26,6 @@ week_of_month(.days, .wdays = NULL)
 ## Examples
 
 ``` r
-week_of_month(c("2026-01-01", "2026-02-01", "2026-03-01"))
-#> Error in week_of_month(c("2026-01-01", "2026-02-01", "2026-03-01")): either pass a date for `.days` or include `.wdays`
+week_of_month(lubridate::ymd(c("2026-01-01", "2026-02-01", "2026-03-01")))
+#> [1] 1 1 1
 ```
