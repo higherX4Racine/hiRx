@@ -1,6 +1,7 @@
 # Word Style Reference Document
 
 ``` r
+
 library(hiRx)
 ```
 
@@ -21,6 +22,7 @@ progenitor for just such a style reference document.
 
 ``` r
 
+
 ggplot2::ggplot() +
     ggplot2::geom_text(ggplot2::aes(x = 1,
                                     y = 1,
@@ -36,6 +38,7 @@ A figure caption
 A table
 
 ``` r
+
 
 knitr::kable(tibble::tribble(
     ~ Foo, ~ Bar, ~ Baz,

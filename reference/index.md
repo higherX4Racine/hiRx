@@ -133,6 +133,10 @@
 - [`collapse_a_factor()`](https://higherx4racine.github.io/hiRx/reference/collapse_a_factor.md)
   : Summarize all of the values of a category
 
+- [`compare_table_column_types()`](https://higherx4racine.github.io/hiRx/reference/compare_table_column_types.md)
+  : Align the columns of data frames to see where their names and types
+  synch up
+
 - [`count_used_digits()`](https://higherx4racine.github.io/hiRx/reference/count_used_digits.md)
   : Count the number of digits that FIPS uses to track a type of area
 

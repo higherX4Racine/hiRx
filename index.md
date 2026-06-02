@@ -9,6 +9,7 @@ County](https://higherx4racine.github.io/hiRx/www.higherexpectationsracinecounty
 You can install the development version of hiRx like so:
 
 ``` r
+
 # install.packages("devtools")
 devtools::install_github("higherX4Racine/hiRx")
 ```

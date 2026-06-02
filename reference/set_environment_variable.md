@@ -38,6 +38,7 @@ set_environment_variable(key, value, overwrite = FALSE, install = FALSE)
 ## Examples
 
 ``` r
+
 if (FALSE) { # \dontrun{
 set_environment_variable("SECRET_KEY" = "111111abc", install = TRUE)
 # First time, reload your environment so you can use the key without restarting R.
